@@ -32,7 +32,7 @@ class AgentAI:
         response = requests.post(self.url, 
                                  headers=headers, 
                                  json=data, 
-                                 timeout=30)
+                                 timeout=120)
 
         if response.status_code == 200:
             return response.json().get('text', '')

@@ -21,18 +21,21 @@ def main():
     print("Programmer Response:", responseProgrammer)
     
     responseDesigner = agentDesigner.get_response(responseProgrammer)
-    print("Designer Response:", responseDesigner)
+    print("\n\nDesigner Response:", responseDesigner)
 
-    for i in range(3):
+    for i in range(3000):
         responseProgrammer = agentProgrammer.get_response(responseDesigner)
-        print("Programmer Response::::::::::::::::::")
+        print("\n\n:::::::::::::::::::Programmer Response::::::::::::::::::")
         print(responseProgrammer)
         
         responseDesigner = agentDesigner.get_response(responseProgrammer)
-        print("Designer Response::::::::::::::::::")
+        print("\n\n:::::::::::::::::::Designer Response::::::::::::::::::")
         print(responseDesigner)
 
-    # Save the conversation to a CSV file
-    agentProgrammer.save_to_excel("programmer_conversation.xlsx")
+        # once every 10 times save to excel
+        if i % 10:
+            agentProgrammer.save_to_excel("programmer_conversation.xlsx")
+
+    
 if __name__ == "__main__":
     main()

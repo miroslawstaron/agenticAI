@@ -173,3 +173,7 @@ cython_debug/
 # PyPI configuration file
 .pypirc
 programmer_conversation.xlsx
+programmer_conversation_gemma2_deepseek.xlsx
+programmer_conversation_llama32_deepseek.xlsx
+programmer_conversation_llama32_deepseek3.xlsx
+programmer_conversation_llama32_llama32.xlsx

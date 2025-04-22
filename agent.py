@@ -6,14 +6,17 @@ class AgentAI:
     
     # attribute to store the list of conversations
     messages = [
-            {"role": "system",
-             "content": "You are a software that writes C programs based on prompts. Provides only the code, no description."}
             ]
 
-    def __init__(self, server_address, model_name):
+    def __init__(self, server_address, model_name, my_role):
         self.server_address = server_address
         self.model_name = model_name
         self.url = f'{self.server_address}/api/chat'
+        self.messages = [
+            {"role": "system",
+             "content": my_role 
+            }
+        ] 
 
     def get_response(self, prompt):
         # send a request to the ollama server
@@ -35,11 +38,38 @@ class AgentAI:
                                  timeout=120)
 
         if response.status_code == 200:
-            return response.json().get('text', '')
-        else:
+            # get the response from the server
+            response_dict = json.loads(response.text)
+
+            # since the response contains a lot of other things, we need to extract the content
+            response_raw = response_dict['message']['content']
+
+            # add the response to the messages list
+            self.messages.append({"role": "assistant", "content": response_raw})
+            return response_raw
+        else:   
+            # on error, we print the error message
             print(f"Error: {response.status_code} - {response.text}")
             return None
         pass
 
     def start(self):
         print(f"Starting agent with model {self.model_name} at {self.server_address}")
+
+    # this function saves the messages to a file
+    def save_to_csv(self,filename):
+        # open the file in write mode
+        with open(filename, 'w') as f:
+            # write the header with $ as separator
+            f.write('role$content\n')
+            # write the messages with $ as separator
+            for message in self.messages:
+                f.write(f"{message['role']}${message['content']}\n")
+
+    # this function saves the messages to an Excel file
+    def save_to_excel(self, filename):
+        import pandas as pd
+        # convert the messages list to a DataFrame and rename columns if necessary
+        df = pd.DataFrame(self.messages)
+        # save the DataFrame to an Excel file without an index column
+        df.to_excel(filename, index=False)

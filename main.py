@@ -9,12 +9,30 @@ def main():
     args = parser.parse_args()
 
     # Create an instance of the Agent class
-    agent = AgentAI(server_address="http://deeperthought.cse.chalmers.se", model_name="llama3.2")
-
-    # Get the response from the agent
-    response = agent.get_response(args.prompt)
+    agentProgrammer = AgentAI(server_address="http://deeperthought.cse.chalmers.se", 
+                              model_name="llama3.2",
+                              my_role="You are a C programmer. You respond with the code in C to solve the task. No comments or explanations")
+    agentDesigner = AgentAI(server_address="http://deepthought.cse.chalmers.se", 
+                            model_name="llama3.2",
+                            my_role="You are a C designer. You will be given a task and you will respond with design suggestions to solve or the task.")
     
-    print("Agent Response:", response)
+    # Get the response from the agent
+    responseProgrammer = agentProgrammer.get_response(args.prompt)
+    print("Programmer Response:", responseProgrammer)
+    
+    responseDesigner = agentDesigner.get_response(responseProgrammer)
+    print("Designer Response:", responseDesigner)
 
+    for i in range(3):
+        responseProgrammer = agentProgrammer.get_response(responseDesigner)
+        print("Programmer Response::::::::::::::::::")
+        print(responseProgrammer)
+        
+        responseDesigner = agentDesigner.get_response(responseProgrammer)
+        print("Designer Response::::::::::::::::::")
+        print(responseDesigner)
+
+    # Save the conversation to a CSV file
+    agentProgrammer.save_to_excel("programmer_conversation.xlsx")
 if __name__ == "__main__":
     main()

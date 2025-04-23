@@ -181,3 +181,8 @@ programmer_conversation_gemma3_gemma2.xlsx
 programmer_conversation_gemma3_minicp_complete.xlsx
 programmer_conversation_llama32_deepseek3_complete.xlsx
 programmer_conversation_llama32_llama32_complete.xlsx
+analyze.html
+analyze_gemma3_gemma2.html
+analyze_gemma3_minicp.html
+analyze_llama32_deepseek.html
+analyze_llama32_llama32.html

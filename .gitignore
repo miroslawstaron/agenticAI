@@ -186,3 +186,11 @@ analyze_gemma3_gemma2.html
 analyze_gemma3_minicp.html
 analyze_llama32_deepseek.html
 analyze_llama32_llama32.html
+programmer_conversation_gemma3_deepseek27b.xlsx
+programmer_conversation_gemma3_gemma2_complete.xlsx
+programmer_conversation_llama32_llama32_complete_code_compilation.xlsx
+programmer_conversation_llama32_llama32_complete_code.xlsx
+programmer_conversation_qwen_qwen.xlsx
+temp/code_1746.c
+temp/code_temp.c
+a.out

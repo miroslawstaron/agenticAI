@@ -10,10 +10,10 @@ def main():
 
     # Create an instance of the Agent class
     agentDesigner = AgentAI(server_address="http://deepthought.cse.chalmers.se", 
-                              model_name="gemma2:2b",
+                              model_name="deepseek-r1:14b",
                               my_role="You are a C designer. You will be given a task and you will respond with design suggestions to solve or the task.")
     agentProgrammer = AgentAI(server_address="http://deeperthought.cse.chalmers.se", 
-                            model_name="gemma3:12b",
+                            model_name="gemma3:27b",
                             my_role="You are a C Programmer. You respond with the code in C to solve the task. No comments or explanations")
     
     # Get the response from the agent
@@ -35,8 +35,8 @@ def main():
         print(f'iteration {i} done')
 
         # once every 10 times save to excel
-        if i % 10:
-            agentProgrammer.save_to_excel("programmer_conversation_gemma3_gemma2.xlsx")
+        if i % 5 == 0:
+            agentProgrammer.save_to_excel("programmer_conversation_gemma3_deepseek27b.xlsx")
 
     
 if __name__ == "__main__":

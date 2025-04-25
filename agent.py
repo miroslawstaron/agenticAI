@@ -20,38 +20,46 @@ class AgentAI:
 
     def get_response(self, prompt):
         # send a request to the ollama server
-       
+        
         # add the user prompt to the messages list
         self.messages.append({"role": "user", "content": prompt})
 
-        
         data = {
             "model": self.model_name,
             "messages": self.messages,
-            "stream": False, 
+            "stream": False,
             "temperature": 0.0,
-            }
+        }
         headers = {'Content-Type': 'application/json'}
-        response = requests.post(self.url, 
-                                 headers=headers, 
-                                 json=data, 
-                                 timeout=600)
 
-        if response.status_code == 200:
-            # get the response from the server
-            response_dict = json.loads(response.text)
+        retries = 3
+        for attempt in range(retries):
+            try:
+                response = requests.post(self.url,
+                                        headers=headers,
+                                        json=data,
+                                        timeout=600)
 
-            # since the response contains a lot of other things, we need to extract the content
-            response_raw = response_dict['message']['content']
+                if response.status_code == 200:
+                    # get the response from the server
+                    response_dict = json.loads(response.text)
 
-            # add the response to the messages list
-            self.messages.append({"role": "assistant", "content": response_raw})
-            return response_raw
-        else:   
-            # on error, we print the error message
-            print(f"Error: {response.status_code} - {response.text}")
-            return None
-        pass
+                    # since the response contains a lot of other things, we need to extract the content
+                    response_raw = response_dict['message']['content']
+
+                    # add the response to the messages list
+                    self.messages.append({"role": "assistant", "content": response_raw})
+                    return response_raw
+                else:
+                    # on error, we print the error message
+                    print(f"Error: {response.status_code} - {response.text}")
+                    return None
+            except requests.exceptions.Timeout:
+                print(f"Timeout occurred. Retrying {attempt + 1}/{retries}...")
+                if attempt == retries - 1:
+                    print("Max retries reached. Exiting.")
+                    return None
+        
 
     def start(self):
         print(f"Starting agent with model {self.model_name} at {self.server_address}")

@@ -191,6 +191,9 @@ programmer_conversation_gemma3_gemma2_complete.xlsx
 programmer_conversation_llama32_llama32_complete_code_compilation.xlsx
 programmer_conversation_llama32_llama32_complete_code.xlsx
 programmer_conversation_qwen_qwen.xlsx
-temp/code_1746.c
-temp/code_temp.c
+temp/*
 a.out
+analyze_gemma_minicp.html
+.gitignore
+analyze_gemma3_gemma2_.html
+analyze_llama32_deepseeker.html

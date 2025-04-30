@@ -4,27 +4,30 @@ from tqdm import tqdm  # Import tqdm for progress bar
 from agent import AgentAI
 
 def main():
+    MAX_ITERATIONS = 5000  # Set the maximum number of iterations
+
     # Parse command-line arguments
     parser = argparse.ArgumentParser(description="Run the AgentAI with a prompt.")
     parser.add_argument("--prompt", type=str, required=True, help="The prompt to send to the agent.")
     args = parser.parse_args()
 
     # Create an instance of the Agent class
-    agentDesigner = AgentAI(server_address="http://deepthought.cse.chalmers.se", 
-                              model_name="deepseek-r1:14b",
+    agentDesigner = AgentAI(server_address="http://deeperthought.cse.chalmers.se", 
+                              model_name="deepseek-r1:7b",
                               my_role="You are a C designer. You will be given a task and you will respond with design suggestions to solve or the task.")
-    agentProgrammer = AgentAI(server_address="http://deeperthought.cse.chalmers.se", 
-                            model_name="llama3.3",
+    
+    agentProgrammer = AgentAI(server_address="http://localhost:11434", 
+                            model_name="gemma3:4b",
                             my_role="You are a C Programmer. You respond with the code in C to solve the task. No comments or explanations")
     
     # Get the response from the agent
     responseProgrammer = agentProgrammer.get_response(args.prompt)
-    print("Programmer Response:", responseProgrammer)
+    #print("Programmer Response:", responseProgrammer)
     
     responseDesigner = agentDesigner.get_response(f'Here is my program, how can I improve it {responseProgrammer}')
-    print("\n\nDesigner Response:", responseDesigner)
+    #print("\n\nDesigner Response:", responseDesigner)
 
-    for i in tqdm(range(100000), desc="Processing iterations"):
+    for i in tqdm(range(MAX_ITERATIONS), desc="Processing iterations"):
         responseProgrammer = agentProgrammer.get_response(responseDesigner)
         #print("\n\n:::::::::::::::::::Programmer Response::::::::::::::::::")
         #print(responseProgrammer[:100])
@@ -33,9 +36,9 @@ def main():
         #print("\n\n:::::::::::::::::::Designer Response::::::::::::::::::")
         #print(responseDesigner[:100])
 
-        # once every 10 times save to excel
+        # once every 5 times save to excel
         if i % 5 == 0:
-            agentProgrammer.save_to_excel("programmer_conversation_llama33_deepseek14b.xlsx")
+            agentProgrammer.save_to_excel("programmer_conversation_gemma3_deepseek7b.xlsx")
 
     
 if __name__ == "__main__":

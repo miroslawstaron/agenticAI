@@ -76,4 +76,4 @@ def xlsx_to_html(input_xlsx, output_html):
         file.write(html_content)
 
 # Example usage
-xlsx_to_html('programmer_conversation_deepseek70b_deepseek70b.xlsx', 'c_deepseek70b_deepseek70b.html')
+xlsx_to_html('programmer_conversation_ll3_ll3.xlsx', 'c_ll3_ll3.html')

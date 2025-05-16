@@ -34,6 +34,8 @@ class AgentAIC(agent.AgentAI):
         self.__compile_messages = self.__initial_compile_messages
 
     def get_response(self, prompt):
+        '''This method gets the response from the model.
+        It sends the prompt to the model and returns the response.'''
         # send a request to the ollama server
         
         # add the user prompt to the messages list
@@ -46,6 +48,7 @@ class AgentAIC(agent.AgentAI):
             "temperature": 0.3,             # adjust this parameter to control the randomness of the output
             "max_tokens": 2096,             # adjust this parameter to control the length of the output
         }
+        
         headers = {'Content-Type': 'application/json'}
 
         retries = 3

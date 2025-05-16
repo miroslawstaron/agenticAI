@@ -1,6 +1,6 @@
 # use the agent.py file to run the agent
 import argparse
-from agentvllm import AgentAI
+from agentvllm import vllmAgentAI
 
 def main():
     # Parse command-line arguments
@@ -9,9 +9,9 @@ def main():
     args = parser.parse_args()
 
     # Create an instance of the Agent class
-    agentProgrammer = AgentAI(model_name="neuralmagic/Meta-Llama-3.1-8B-Instruct-quantized.w4a16",
+    agentProgrammer = vllmAgentAI(model_name="neuralmagic/Meta-Llama-3.1-8B-Instruct-quantized.w4a16",
                               my_role="You are a C programmer. You respond with the code in C to solve the task. No comments or explanations")
-    agentDesigner = AgentAI(model_name="neuralmagic/Meta-Llama-3.1-8B-Instruct-quantized.w4a16",
+    agentDesigner = vllmAgentAI(model_name="neuralmagic/Meta-Llama-3.1-8B-Instruct-quantized.w4a16",
                             my_role="You are a C designer. You will be given a task and you will respond with design suggestions to solve or the task.")
     
     # Get the response from the agent

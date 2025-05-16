@@ -5,7 +5,7 @@ import requests
 from vllm import LLM, SamplingParams
 
 
-class AgentAI:
+class vllmAgentAI:
     
     # attribute to store the list of conversations
     messages = [

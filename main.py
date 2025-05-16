@@ -12,12 +12,12 @@ def main():
     args = parser.parse_args()
 
     # Create an instance of the Agent class
-    agentDesigner = AgentAI(server_address="http://deeperthought.cse.chalmers.se", 
-                              model_name="deepseek-r1:7b",
+    agentDesigner = AgentAI(server_address="http://localhost:11434", 
+                              model_name="phi4-mini",
                               my_role="You are a C designer. You will be given a task and you will respond with design suggestions to solve or the task.")
     
     agentProgrammer = AgentAI(server_address="http://localhost:11434", 
-                            model_name="gemma3:4b",
+                            model_name="phi4-mini",
                             my_role="You are a C Programmer. You respond with the code in C to solve the task. No comments or explanations")
     
     # Get the response from the agent
@@ -38,7 +38,7 @@ def main():
 
         # once every 5 times save to excel
         if i % 5 == 0:
-            agentProgrammer.save_to_excel("programmer_conversation_gemma3_deepseek7b.xlsx")
+            agentProgrammer.save_to_excel("programmer_conversation_phi4-mini_phi4-mini.xlsx")
 
     
 if __name__ == "__main__":

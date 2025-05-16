@@ -5,6 +5,18 @@ import requests
 import json
 
 class AgentAIC(agent.AgentAI):
+    '''This class is an agent that uses the Ollama server to generate C code.
+    It is a subclass of the AgentAI class.
+    It is used to generate C code and compile it using gcc.
+    It uses the requests library to communicate with the server.
+    It uses the subprocess library to compile the code using gcc.
+    It uses the re library to extract the code from the markdown code block.
+    It uses the json library to parse the response from the server.
+    It uses the tqdm library to show the progress of the iterations.
+    
+    This class has two pipelines when talking to the model: 
+    1. The first one is the main conversation between the model and the user.
+    2. The second one is the conversation between the model and the user that is aimed to solve compilation errors.'''
 
     def __init__(self, server_address, model_name, my_role):
         self.server_address = server_address        # address of the server
@@ -48,7 +60,7 @@ class AgentAIC(agent.AgentAI):
             "temperature": 0.3,             # adjust this parameter to control the randomness of the output
             "max_tokens": 2096,             # adjust this parameter to control the length of the output
         }
-        
+
         headers = {'Content-Type': 'application/json'}
 
         retries = 3

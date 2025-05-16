@@ -181,7 +181,7 @@ class AgentAIC(agent.AgentAI):
         # please note that we use the __compile_messages list to store the conversation
         # between the model and the user
         self.__compile_messages.append({"role": "user", "content": strPrompt})
-        print("Prompt:", strPrompt)
+        
         # get the response from the model
         strResult = self.__get_response_compilation(strPrompt)
         return strResult

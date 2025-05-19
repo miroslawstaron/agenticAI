@@ -5,7 +5,7 @@ from agentC import AgentAIC
 from agent import AgentAI
 from tqdm import tqdm
 
-MAX_ITERATIONS = 2  # Set the maximum number of iterations
+MAX_ITERATIONS = 5  # Set the maximum number of iterations
 
 def main():
     # Parse command-line arguments
@@ -19,7 +19,7 @@ def main():
                               my_role="You are a C programmer. You respond with the code in C to solve the task. No comments or explanations")
     
     agentDesigner = AgentAI(server_address="http://deeperthought.cse.chalmers.se", 
-                            model_name="llama3.3",
+                            model_name="llama3.2",
                             my_role="You are a C designer. You will be given a task and you will respond with design suggestions to solve or the task.")
     
 
@@ -35,7 +35,7 @@ def main():
             # for all the other iterations, we only match the responses from one another
             responseProgrammer = agentProgrammer.get_response(responseDesigner)
             
-            responseDesigner = agentDesigner.get_response(responseProgrammer)
+            responseDesigner = agentDesigner.get_response(f'How to improve this code: {responseProgrammer}')
 
         # save to excel to get the conversation saved somewhere
         agentProgrammer.save_to_excel("programmer_conversation_test.xlsx")

@@ -76,9 +76,14 @@ class AgentAIC(agent.AgentAI):
                                               model_name=self.model_name, 
                                               trials=3)
                     
-                    agentComp.get_response(response_raw)
+                    strCodeResponse = agentComp.get_response(response_raw)
                     
-                    return response_raw
+                    # add the response to the messages list
+                    self.messages.append({"role": "assistant", "content": self.__get_code(strCodeResponse)})
+
+                    # contrary to the parent class, we need to return the code
+                    # and not the response
+                    return strCodeResponse
                 else:
                     # on error, we print the error message
                     print(f"Error: {response.status_code} - {response.text}")
@@ -117,59 +122,3 @@ class AgentAIC(agent.AgentAI):
         
         return self.code
     
-    def start(self, tries: int, prompt: str) -> str:
-        '''This method starts the agent. 
-        It talks to the model and tries to fix problems if there are any.
-        It sends the prompt to the model and returns the response.'''
-        
-        attempt = 0
-        __strResult = ""
-        
-        # get the response from the server
-        self.__response = self.get_response(prompt)
-
-        self.__mdCode = self.__get_code(self.__response)
-        
-        self.__code = self.__mdCode
-        
-        # compile the code
-        self.compile_result = self.__compile_code(self.__code)
-        
-        __strResult = self.__code
-        
-        while attempt < tries and self.__compile_result != "Compilation successful":
-            # solve the problem
-            __strResult = self.__solve_problem()
-
-            # compile the result
-            self.__code = self.__get_code(__strResult)
-            
-            # checking the compilation result of the code
-            self.__compile_result = self.__compile_code(self.__code)
-
-            # if the compilation was successful, we break the loop
-            # if the compilation was not successful, we try again
-            if self.__compile_result == "Compilation successful":
-                break
-            
-            attempt += 1
-
-        # when we finish the loop,
-        # we check if the compilation was successful
-        # if no, then we return the code and the error message
-        # if yes, then we return the code only
-        if attempt == tries and self.__compile_result != "Compilation successful":
-            strResult = f'Compilation failed after {attempt} attempts. Code: {self.__code}, the last error was: {self.__compile_result}'
-        else:
-            strResult = __strResult
-
-        # add this to the messages in the main conversation
-        self.messages.append({"role": "assistant", "content": strResult})
-
-        # and clean up the compile messages
-        # it is important because the next time we need to solve a problem
-        # it is a different problem and the situation must start from scratch
-        self.__compile_messages = self.__initial_compile_messages
-
-        # return the result
-        return strResult

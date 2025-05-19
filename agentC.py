@@ -3,6 +3,7 @@ import subprocess
 import re
 import requests
 import json
+from agentCompiler import AgentCompiler
 
 class AgentAIC(agent.AgentAI):
     '''This class is an agent that uses the Ollama server to generate C code.
@@ -33,17 +34,6 @@ class AgentAIC(agent.AgentAI):
              "content": my_role 
             }
         ] 
-
-        # initial compile messages queue
-        self.__initial_compile_messages = [
-            {"role": "system",
-             "content": "You are a C Programmer. You solve problems with C programs, no comments or explanations. "
-            }
-        ]
-
-        # the conversation between the model and the user
-        # that is aimed to solve compilation errors
-        self.__compile_messages = self.__initial_compile_messages
 
     def get_response(self, prompt):
         '''This method gets the response from the model.
@@ -79,7 +69,15 @@ class AgentAIC(agent.AgentAI):
                     response_raw = response_dict['message']['content']
 
                     # this is the difference to the parent class
-                    # we do NOT add the response to the messages list
+                    # now we need to ask the compiler agent to compile the code
+                    # and return the result
+                    # we need to add the response to the messages list
+                    agentComp = AgentCompiler(server_address=self.server_address, 
+                                              model_name=self.model_name, 
+                                              trials=3)
+                    
+                    agentComp.get_response(response_raw)
+                    
                     return response_raw
                 else:
                     # on error, we print the error message
@@ -90,49 +88,6 @@ class AgentAIC(agent.AgentAI):
                 if attempt == retries - 1:
                     print("Max retries reached. Exiting.")
                     return None
-
-    def __get_response_compilation(self, prompt: str) -> str:
-        '''This method gets the response from the model. 
-        It sends the prompt to the model and returns the response.'''
-        
-        data = {
-            "model": self.model_name,
-            "messages": self.__compile_messages,
-            "stream": False,
-            "temperature": 0.0,
-        }
-        headers = {'Content-Type': 'application/json'}
-
-        # we use three retries just in case the server is busy
-        # or there is a timeout
-        retries = 3     
-
-
-        for attempt in range(retries):
-            try:
-                # communicate with the server
-                response = requests.post(self.url,
-                                        headers=headers,
-                                        json=data,
-                                        timeout=300)
-
-                if response.status_code == 200:
-                    # get the response from the server
-                    response_dict = json.loads(response.text)
-
-                    # since the response contains a lot of other things, we need to extract the content
-                    response_raw = response_dict['message']['content']
-
-                    return response_raw
-                else:
-                    # on error, we print the error message
-                    print(f"Error: {response.status_code} - {response.text}")
-                    return None
-            except requests.exceptions.Timeout:
-                print(f"Timeout occurred. Retrying {attempt + 1}/{retries}...")
-                if attempt == retries - 1:
-                    print("Max retries reached. Exiting.")
-            return None
 
     def __extract_c_code(self, markdown: str) -> str:
         '''This function extracts the C code from a markdown string.'''
@@ -161,45 +116,6 @@ class AgentAIC(agent.AgentAI):
             self.code = '\n'.join(self.code)
         
         return self.code
-    
-    # compile the code using gcc
-    def __compile_code(self, code: str) -> str:
-        '''This method compiles the code using gcc.
-        It returns the result of the compilation.'''
-
-        if self.__code != "":
-            with open(f'./temp/code_temp.c', 'w+') as f:
-                f.write(self.__code)
-            # compile the code using gcc
-            result = subprocess.run(['gcc', '-w', f'./temp/code_temp.c', '-o', './temp/a.out', '-lm'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-
-            # print the output of the compilation
-            # print(result.stdout.decode())
-            # print(result.stderr.decode())
-
-            # check if the output of the compilation contains the word "error"
-            if b'error' in result.stderr:
-                self.__compile_result = f"Compilation error: {result.stderr.decode()}"
-            else:
-                self.__compile_result = "Compilation successful"
-        else:
-            self.__compile_result = "No code found"   
-
-        return self.__compile_result
-
-    def __solve_problem(self) -> str:
-        '''This method solves the compilation problems using the model.
-        It sends the prompt to the model and returns the response.'''     
-
-        strPrompt = f'For this program {self.__code}, I got the following compilation error: {self.__compile_result}. Please fix the code and return the fixed code in a markdown code block.'
-        
-        # please note that we use the __compile_messages list to store the conversation
-        # between the model and the user
-        self.__compile_messages.append({"role": "user", "content": strPrompt})
-        
-        # get the response from the model
-        strResult = self.__get_response_compilation(strPrompt)
-        return strResult
     
     def start(self, tries: int, prompt: str) -> str:
         '''This method starts the agent. 

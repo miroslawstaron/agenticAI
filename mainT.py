@@ -5,7 +5,7 @@ from agentC import AgentAIC
 from agent import AgentAI
 from tqdm import tqdm
 
-MAX_ITERATIONS = 5  # Set the maximum number of iterations
+MAX_ITERATIONS = 5000  # Set the maximum number of iterations
 
 def main():
     # Parse command-line arguments
@@ -14,12 +14,12 @@ def main():
     args = parser.parse_args()
 
     # Create an instance of the Agent class
-    agentProgrammer = AgentAIC(server_address="http://deepthought.cse.chalmers.se", 
-                              model_name="llama3.2",
+    agentProgrammer = AgentAIC(server_address="http://deeperthought.cse.chalmers.se", 
+                              model_name="llama3.3",
                               my_role="You are a C programmer. You respond with the code in C to solve the task. No comments or explanations")
     
-    agentDesigner = AgentAI(server_address="http://deeperthought.cse.chalmers.se", 
-                            model_name="llama3.2",
+    agentDesigner = AgentAI(server_address="http://deepthought.cse.chalmers.se", 
+                            model_name="deepseek-r1:7b",
                             my_role="You are a C designer. You will be given a task and you will respond with design suggestions to solve or the task.")
     
 
@@ -38,7 +38,7 @@ def main():
             responseDesigner = agentDesigner.get_response(f'How to improve this code: {responseProgrammer}')
 
         # save to excel to get the conversation saved somewhere
-        agentProgrammer.save_to_excel("programmer_conversation_test.xlsx")
+        agentProgrammer.save_to_excel("programmer_conversation_deepseek7b_llama33_comp.xlsx")
  
     
 if __name__ == "__main__":

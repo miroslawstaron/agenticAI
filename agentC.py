@@ -79,7 +79,7 @@ class AgentAIC(agent.AgentAI):
                     strCodeResponse = agentComp.get_response(response_raw)
                     
                     # add the response to the messages list
-                    self.messages.append({"role": "assistant", "content": self.__get_code(strCodeResponse)})
+                    self.messages.append({"role": "assistant", "content": strCodeResponse})
 
                     # contrary to the parent class, we need to return the code
                     # and not the response

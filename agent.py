@@ -28,7 +28,7 @@ class AgentAI:
             "model": self.model_name,
             "messages": self.messages,
             "stream": False,
-            "temperature": 0.0,
+            "temperature": 0.5,
         }
         headers = {'Content-Type': 'application/json'}
 

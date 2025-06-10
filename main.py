@@ -24,8 +24,8 @@ def main():
     args = parser.parse_args()
 
     # Create an instance of the Agent class
-    agentDesigner = AgentAI(server_address="http://deeperthought.cse.chalmers.se", 
-                              model_name="deepseek-r1:7b",
+    agentDesigner = AgentAI(server_address="http://localhost:11435", 
+                              model_name="deepseek-r1:70b",
                               my_role="You are a C designer. You will be given a task and you will respond with design suggestions to solve or the task.")
     
     agentProgrammer = AgentAI(server_address="http://deepthought.cse.chalmers.se", 

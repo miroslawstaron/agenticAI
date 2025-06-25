@@ -4,6 +4,7 @@ import re
 import requests
 import json
 from agentCompiler import AgentCompiler
+from agentStaticAnalyzer import AgentStaticAnalyzer
 
 class AgentAIC(agent.AgentAI):
     '''This class is an agent that uses the Ollama server to generate C code.
@@ -75,11 +76,21 @@ class AgentAIC(agent.AgentAI):
                     agentComp = AgentCompiler(server_address=self.server_address, 
                                               model_name=self.model_name, 
                                               trials=3)
-                    
+                    agentAnalyzer = AgentStaticAnalyzer(server_address=self.server_address, 
+                                              model_name=self.model_name, 
+                                              trials=3)
+
                     strCodeResponse = agentComp.get_response(response_raw)
+                    print("going into SA")
+                    strCodeResponse2 = agentAnalyzer.get_response(response_raw)
+                    print(f'SA: {strCodeResponse2[:100]}')
+                    strCodeResponse3 = strCodeResponse + "¤¤¤¤¤" + strCodeResponse2
+                   
+
                     
                     # add the response to the messages list
-                    self.messages.append({"role": "assistant", "content": strCodeResponse})
+                    self.messages.append({"role": "assistant", "content": strCodeResponse3})
+                    agentAnalyzer.save_to_excel("static_analysis_log.xlsx")
 
                     # contrary to the parent class, we need to return the code
                     # and not the response

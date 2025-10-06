@@ -5,7 +5,7 @@ from agentC import AgentAIC
 from agent import AgentAI
 from tqdm import tqdm
 
-MAX_ITERATIONS = 1000  # Set the maximum number of iterations
+MAX_ITERATIONS = 10  # Set the maximum number of iterations
 
 def main():
     # Parse command-line arguments
@@ -14,11 +14,11 @@ def main():
     args = parser.parse_args()
 
     # Create an instance of the Agent class
-    agentProgrammer = AgentAIC(server_address="http://lazythought.cse.chalmers.se", 
+    agentProgrammer = AgentAIC(server_address="http://lazythought.cse.chalmers.se/v1/chat/completions", 
                               model_name="llama3.2:3b",
                               my_role="You are a C programmer. You respond with the code in C to solve the task. No comments or explanations")
     
-    agentDesigner = AgentAI(server_address="http://lazythought.cse.chalmers.se", 
+    agentDesigner = AgentAI(server_address="http://lazythought.cse.chalmers.se/v1/chat/completions", 
                             model_name="gpt-oss:20b",
                             my_role="You are a C designer. You will be given a task and you will respond with design suggestions to solve or the task.")
     
@@ -43,9 +43,9 @@ def main():
             responseDesigner = agentDesigner.get_response(responseProgrammer)
 
         # save to excel to get the conversation saved somewhere
-        agentProgrammer.save_to_excel("./results/programmer_compiler_conversation_oss20b_llama32_3b.xlsx")
+        agentProgrammer.save_to_excel("./results/programmer_compiler_conversation_oss20b_llama32_3b_t.xlsx")
 
-    agentProgrammer.save_to_excel("./results/programmer_compiler_conversation_oss20b_llama32_3b.xlsx")
+    agentProgrammer.save_to_excel("./results/programmer_compiler_conversation_oss20b_llama32_3b_t.xlsx")
     
 if __name__ == "__main__":
     main()

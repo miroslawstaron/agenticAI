@@ -13,7 +13,7 @@ class AgentAI:
     def __init__(self, server_address, model_name, my_role):
         self.server_address = server_address
         self.model_name = model_name
-        self.url = f'{self.server_address}/api/chat'
+        self.url = f'{self.server_address}'
         self.messages = [
             {"role": "system",
              "content": my_role 
@@ -47,7 +47,7 @@ class AgentAI:
                     response_dict = json.loads(response.text)
 
                     # since the response contains a lot of other things, we need to extract the content
-                    response_raw = response_dict['message']['content']
+                    response_raw = response_dict['choices'][0]['message']['content']
 
                     # add the response to the messages list
                     self.messages.append({"role": "assistant", "content": response_raw})

@@ -11,7 +11,7 @@ class AgentCompiler(agent.AgentAI):
     def __init__(self, server_address, model_name, trials):
         self.server_address = server_address        # address of the server
         self.model_name = model_name                # name of the model 
-        self.url = f'{self.server_address}/api/chat'    # chat API endpoint
+        self.url = f'{self.server_address}'    # chat API endpoint
         self.__response = ""                    # response from the model
         self.__mdCode = ""                      # markdown code block, which is part of the response
         self.__code = ""                        # just the code from the markdown code block   
@@ -103,7 +103,7 @@ class AgentCompiler(agent.AgentAI):
                     response_dict = json.loads(response.text)
 
                     # since the response contains a lot of other things, we need to extract the content
-                    response_raw = response_dict['message']['content']
+                    response_raw = response_dict['choices'][0]['message']['content']
 
                     # this is the difference to the parent class
                     # we do NOT add the response to the messages list
@@ -148,7 +148,7 @@ class AgentCompiler(agent.AgentAI):
                     response_dict = json.loads(response.text)
 
                     # since the response contains a lot of other things, we need to extract the content
-                    response_raw = response_dict['message']['content']
+                    response_raw = response_dict['choices'][0]['message']['content']
 
                     return response_raw
                 else:

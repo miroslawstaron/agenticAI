@@ -10,10 +10,11 @@ class AgentAI:
     messages = [
             ]
 
-    def __init__(self, server_address, model_name, my_role):
+    def __init__(self, server_address, model_name, my_role, max_tokens=16000):
         self.server_address = server_address
         self.model_name = model_name
         self.url = f'{self.server_address}'
+        self.max_tokens = max_tokens
         self.messages = [
             {"role": "system",
              "content": my_role 
@@ -31,6 +32,7 @@ class AgentAI:
             "messages": self.messages,
             "stream": False,
             "temperature": 0.5,
+            "max_tokens": self.max_tokens,             # adjust this parameter to control the length of the output
         }
         headers = {'Content-Type': 'application/json'}
 

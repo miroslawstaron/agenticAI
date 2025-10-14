@@ -49,7 +49,7 @@ class AgentAIC(agent.AgentAI):
             "messages": self.messages,
             "stream": False,
             "temperature": 0.3,             # adjust this parameter to control the randomness of the output
-            "max_tokens": 8196,             # adjust this parameter to control the length of the output
+            "max_tokens": 16000,             # adjust this parameter to control the length of the output
         }
 
         headers = {'Content-Type': 'application/json'}

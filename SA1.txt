@@ -325,3 +325,45 @@ int next_fibonacci(uint32_t n, uint64_t *fn) {
 nofile:0:0: information: Active checkers: 106/592 (use --checkers-report=<filename> to see details) [checkersReport]
 
 
+Analyzer result: Static Analyzer Issue: temp/code_temp.c:1:17: error: The code contains unhandled character(s) (character code=226). Neither unicode nor extended ascii is supported. [syntaxError]
+**Fibonacci Nim – A Two‑Player Console Game (Python)**
+                ^
+nofile:0:0: information: Unmatched suppression: missingIncludeSystem [unmatchedSuppression]
+
+nofile:0:0: information: Active checkers: There was critical errors (use --checkers-report=<filename> to see details) [checkersReport]
+
+
+Analyzer result: Static Analyzer Issue: temp/code_temp.c:1:28: error: The code contains unhandled character(s) (character code=226). Neither unicode nor extended ascii is supported. [syntaxError]
+Below is a **complete, self‑contained Python program** that implements a two‑player “Fibonacci Nim” game.
+                           ^
+nofile:0:0: information: Unmatched suppression: missingIncludeSystem [unmatchedSuppression]
+
+nofile:0:0: information: Active checkers: There was critical errors (use --checkers-report=<filename> to see details) [checkersReport]
+
+
+Analyzer result: Static Analyzer Issue: temp/code_temp.c:1:26: error: The code contains unhandled character(s) (character code=226). Neither unicode nor extended ascii is supported. [syntaxError]
+Below is a **single, self‑contained Python script** that implements a two‑player “Fibonacci Nim” game.
+                         ^
+nofile:0:0: information: Unmatched suppression: missingIncludeSystem [unmatchedSuppression]
+
+nofile:0:0: information: Active checkers: There was critical errors (use --checkers-report=<filename> to see details) [checkersReport]
+
+
+Analyzer result: Static Analyzer Issue: temp/code_temp.c:268:9: style: Unused variable: opt [unusedVariable]
+    int opt;
+        ^
+nofile:0:0: information: Active checkers: 106/592 (use --checkers-report=<filename> to see details) [checkersReport]
+
+
+Analyzer result: Static Analyzer Issue: temp/code_temp.c:340:17: error: Memory leak: g.moves [memleak]
+                return EXIT_FAILURE;
+                ^
+temp/code_temp.c:150:29: style: Parameter 'g' can be declared as pointer to const [constParameterPointer]
+static int human_move(Game *g)
+                            ^
+temp/code_temp.c:284:11: style: Variable 'token' can be declared as pointer to const [constVariablePointer]
+    char *token = strtok(copy, " ");
+          ^
+nofile:0:0: information: Active checkers: 106/592 (use --checkers-report=<filename> to see details) [checkersReport]
+
+

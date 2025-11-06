@@ -4,8 +4,11 @@ import argparse
 from agentC import AgentAIC
 from agent import AgentAI
 from tqdm import tqdm
+import os
 
-MAX_ITERATIONS = 10  # Set the maximum number of iterations
+MAX_ITERATIONS = 2  # Set the maximum number of iterations
+FILENAME_RESULT = "results/conversation_result_test.xlsx"
+API_KEY = os.getenv('OPENAI_API_KEY', '')
 
 def main():
     # Parse command-line arguments
@@ -16,18 +19,22 @@ def main():
     # Create an instance of the Agent class
     agentProgrammer = AgentAIC(server_address="http://lazythought.cse.chalmers.se/v1/chat/completions", 
                               model_name="llama3.2:3b",
+                              api_key=API_KEY,
                               my_role="You are a C programmer. You respond with the code in C to solve the task. No comments or explanations")
     
-    agentDesigner = AgentAI(server_address="http://lazythought.cse.chalmers.se/v1/chat/completions", 
-                            model_name="gpt-oss:20b",
+    agentDesigner = AgentAI(server_address="http://deeperthought.cse.chalmers.se/v1/chat/completions", 
+                            model_name="deepseek-r1:32b",
+                            api_key=API_KEY,
                             my_role="You are a C designer. You will be given a task and you will respond with design suggestions to solve or the task.")
     
     # Get the response from the agent
     responseProgrammer = agentProgrammer.get_response(args.prompt)
-    #print("Programmer Response:", responseProgrammer)
+    # print("Programmer Response:", responseProgrammer)
     
+    # Get the response from the designer
     responseDesigner = agentDesigner.get_response(f'Here is my program, how can I improve it {responseProgrammer}?')
-
+    # print("Designer Response:", responseDesigner)
+    
     for i in tqdm(range(MAX_ITERATIONS), desc="Processing iterations"):
         # if this is the first iteration, then we use the original prompt
         if i == 0:
@@ -43,9 +50,9 @@ def main():
             responseDesigner = agentDesigner.get_response(responseProgrammer)
 
         # save to excel to get the conversation saved somewhere
-        agentProgrammer.save_to_excel("./results/programmer_compiler_conversation_oss20b_llama32_3b_t.xlsx")
+        agentProgrammer.save_to_excel(FILENAME_RESULT)
 
-    agentProgrammer.save_to_excel("./results/programmer_compiler_conversation_oss20b_llama32_3b_t.xlsx")
-    
+    agentProgrammer.save_to_excel(FILENAME_RESULT)
+
 if __name__ == "__main__":
     main()

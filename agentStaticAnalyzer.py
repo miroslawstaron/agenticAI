@@ -90,6 +90,9 @@ class AgentStaticAnalyzer(agent.AgentAI):
             "temperature": 0.0,
         }
         headers = {'Content-Type': 'application/json'}
+        api_key = os.getenv('OPENAI_API_KEY', '')
+        if api_key:
+            headers['Authorization'] = f'Bearer {api_key}'
 
         # we use three retries just in case the server is busy
         # or there is a timeout

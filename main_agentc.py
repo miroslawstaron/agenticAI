@@ -13,7 +13,12 @@ API_KEY = os.getenv('OPENAI_API_KEY', '')
 def main():
     # Parse command-line arguments
     parser = argparse.ArgumentParser(description="Run the AgentAI with a prompt.")
-    parser.add_argument("--prompt", type=str, required=True, help="The prompt to send to the agent.")
+    
+    parser.add_argument("--prompt", 
+                        type=str, 
+                        required=True, 
+                        help="The prompt to send to the agent.")
+    
     args = parser.parse_args()
 
     # Create an instance of the Agent class

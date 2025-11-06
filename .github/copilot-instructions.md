@@ -7,14 +7,16 @@ This is a research project that implements multi-agent AI conversations for C co
 
 ### Agent System (`agent.py`, `agentC.py`, `agentCompiler.py`)
 - **`AgentAI`**: Base class managing Ollama API conversations with persistent message history
-- **`AgentAIC`**: Extends base with C code compilation and error fixing capabilities
-- **`AgentCompiler`**: Specialized for compilation error detection and automated fixes
+- **`AgentAIC`**: Extends base with C code compilation and error fixing capabilities. It communicates with AgentCompiler for validation.
+- **`AgentCompiler`**: Specialized for compilation error detection and automated fixes. It uses gcc to compile extracted C code snippets.
 - All agents maintain conversation state via `self.messages` list with role-based structure
+- **`AgentStaticAnalyzer`**: Analyzes C code for static issues using LLMs without compilation
+- **`AgentHuman`**: Facilitates human-in-the-loop conversations for manual code review. It is essentially a wrapper for human input.
 
 ### Execution Patterns
 - **Standard mode** (`main.py`): Designer-programmer conversation loop with progress tracking
-- **Compiler mode** (`main_agentc.py`): Adds compilation validation to conversation cycles  
-- **Multiple variants** (`main2.py`, `mainT.py`): Different model combinations and server configurations
+- **Compiler mode** (`main_agentc.py`): Adds compilation validation to conversation cycles
+- **Multiple variants** (`main2.py`, `mainT.py`, `main_human.py`): Different model combinations and server configurations
 
 ### Key Configuration Points
 ```python

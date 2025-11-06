@@ -1,0 +1,369 @@
+Analyzer result: temp/code_temp.c:15:15: warning: Either the condition 'n<=1' is redundant or the array 'fib[2147483648]' is accessed at index 2147483648, which is out of bounds. [arrayIndexOutOfBoundsCond]
+    return fib[n];
+              ^
+temp/code_temp.c:5:11: note: Assuming that condition 'n<=1' is not redundant
+    if (n <= 1)
+          ^
+temp/code_temp.c:15:15: note: Array index out of bounds
+    return fib[n];
+              ^
+temp/code_temp.c:41:9: warning: scanf() without field width limits can crash with huge input data. [invalidscanf]
+        scanf("%s", choice);
+        ^
+nofile:0:0: information: Active checkers: 106/592 (use --checkers-report=<filename> to see details) [checkersReport]
+
+
+Analyzer result: temp/code_temp.c:12:15: warning: Either the condition 'n<=1' is redundant or the array 'fib[2147483648]' is accessed at index 2147483648, which is out of bounds. [arrayIndexOutOfBoundsCond]
+    return fib[n];
+              ^
+temp/code_temp.c:5:11: note: Assuming that condition 'n<=1' is not redundant
+    if (n <= 1)
+          ^
+temp/code_temp.c:12:15: note: Array index out of bounds
+    return fib[n];
+              ^
+nofile:0:0: information: Active checkers: 106/592 (use --checkers-report=<filename> to see details) [checkersReport]
+
+
+Analyzer result: temp/code_temp.c:44:13: warning: %llu in format string (no. 1) requires 'unsigned long long' but the argument type is 'unsigned long'. [invalidPrintfArgType_uint]
+            printf("%llu ", val);
+            ^
+temp/code_temp.c:25:28: style: The scope of the variable 'tmp' can be reduced. [variableScope]
+    uint64_t a = 0, b = 1, tmp;
+                           ^
+nofile:0:0: information: Active checkers: 106/592 (use --checkers-report=<filename> to see details) [checkersReport]
+
+
+Analyzer result: temp/code_temp.c:37:13: warning: %llu in format string (no. 1) requires 'unsigned long long' but the argument type is 'unsigned long'. [invalidPrintfArgType_uint]
+            printf("%llu ", val);
+            ^
+nofile:0:0: information: Active checkers: 106/592 (use --checkers-report=<filename> to see details) [checkersReport]
+
+
+Analyzer result: temp/code_temp.c:59:28: style: The scope of the variable 'tmp' can be reduced. [variableScope]
+    uint64_t a = 0, b = 1, tmp;
+                           ^
+nofile:0:0: information: Active checkers: 106/592 (use --checkers-report=<filename> to see details) [checkersReport]
+
+
+Analyzer result: temp/code_temp.c:12:15: warning: Either the condition 'n<=1' is redundant or the array 'fib[2147483648]' is accessed at index 2147483648, which is out of bounds. [arrayIndexOutOfBoundsCond]
+    return fib[n];
+              ^
+temp/code_temp.c:5:11: note: Assuming that condition 'n<=1' is not redundant
+    if (n <= 1)
+          ^
+temp/code_temp.c:12:15: note: Array index out of bounds
+    return fib[n];
+              ^
+temp/code_temp.c:39:21: warning: Opposite inner 'if' condition leads to a dead code block. [oppositeInnerCondition]
+            if (fib > num)
+                    ^
+temp/code_temp.c:37:16: note: outer condition: fib<=num
+    while (fib <= num) {
+               ^
+temp/code_temp.c:39:21: note: opposite inner condition: fib>num
+            if (fib > num)
+                    ^
+nofile:0:0: information: Active checkers: 106/592 (use --checkers-report=<filename> to see details) [checkersReport]
+
+
+Analyzer result: temp/code_temp.c:29:13: warning: %llu in format string (no. 1) requires 'unsigned long long' but the argument type is 'unsigned long'. [invalidPrintfArgType_uint]
+            printf("%llu ", a);
+            ^
+temp/code_temp.c:31:13: warning: %llu in format string (no. 1) requires 'unsigned long long' but the argument type is 'unsigned long'. [invalidPrintfArgType_uint]
+            printf("%llu ", b);
+            ^
+temp/code_temp.c:36:13: warning: %llu in format string (no. 1) requires 'unsigned long long' but the argument type is 'unsigned long'. [invalidPrintfArgType_uint]
+            printf("%llu ", b);
+            ^
+temp/code_temp.c:121:13: warning: %llu in format string (no. 1) requires 'unsigned long long' but the argument type is 'unsigned long'. [invalidPrintfArgType_uint]
+            printf("%llu is %s a Fibonacci number.\n",
+            ^
+temp/code_temp.c:133:13: warning: %llu in format string (no. 1) requires 'unsigned long long' but the argument type is 'unsigned long'. [invalidPrintfArgType_uint]
+            printf("The first Fibonacci number greater than %llu is %llu.\n",
+            ^
+temp/code_temp.c:133:13: warning: %llu in format string (no. 2) requires 'unsigned long long' but the argument type is 'unsigned long'. [invalidPrintfArgType_uint]
+            printf("The first Fibonacci number greater than %llu is %llu.\n",
+            ^
+temp/code_temp.c:63:11: style: Variable 'end' can be declared as pointer to const [constVariablePointer]
+    char *end = strchr(line, '\n');
+          ^
+temp/code_temp.c:75:11: style: Variable 'end' can be declared as pointer to const [constVariablePointer]
+    char *end = strchr(line, '\n');
+          ^
+temp/code_temp.c:11:0: style: The function 'fib_n' is never used. [unusedFunction]
+static uint64_t fib_n(uint32_t n) {
+^
+nofile:0:0: information: Active checkers: 106/592 (use --checkers-report=<filename> to see details) [checkersReport]
+
+
+Analyzer result: temp/code_temp.c:54:13: warning: %llu in format string (no. 1) requires 'unsigned long long' but the argument type is 'unsigned long'. [invalidPrintfArgType_uint]
+            printf("%llu ", a);
+            ^
+temp/code_temp.c:56:13: warning: %llu in format string (no. 1) requires 'unsigned long long' but the argument type is 'unsigned long'. [invalidPrintfArgType_uint]
+            printf("%llu ", b);
+            ^
+temp/code_temp.c:61:13: warning: %llu in format string (no. 1) requires 'unsigned long long' but the argument type is 'unsigned long'. [invalidPrintfArgType_uint]
+            printf("%llu ", b);
+            ^
+temp/code_temp.c:136:13: warning: %llu in format string (no. 1) requires 'unsigned long long' but the argument type is 'unsigned long'. [invalidPrintfArgType_uint]
+            printf("%llu is %s a Fibonacci number.\n",
+            ^
+temp/code_temp.c:147:13: warning: %llu in format string (no. 1) requires 'unsigned long long' but the argument type is 'unsigned long'. [invalidPrintfArgType_uint]
+            printf("The first Fibonacci number greater than %llu is %llu.\n",
+            ^
+temp/code_temp.c:147:13: warning: %llu in format string (no. 2) requires 'unsigned long long' but the argument type is 'unsigned long'. [invalidPrintfArgType_uint]
+            printf("The first Fibonacci number greater than %llu is %llu.\n",
+            ^
+temp/code_temp.c:5:0: style: The function 'fib_iter' is never used. [unusedFunction]
+uint64_t fib_iter(uint32_t n) {
+^
+temp/code_temp.c:23:0: style: The function 'fib_fast' is never used. [unusedFunction]
+uint64_t fib_fast(uint32_t n) {
+^
+nofile:0:0: information: Active checkers: 106/592 (use --checkers-report=<filename> to see details) [checkersReport]
+
+
+Analyzer result: temp/code_temp.c:56:26: warning: %llu in format string (no. 1) requires 'unsigned long long' but the argument type is 'unsigned long'. [invalidPrintfArgType_uint]
+        if (i == 0)      fprintf(out, "%llu ", a);
+                         ^
+temp/code_temp.c:57:26: warning: %llu in format string (no. 1) requires 'unsigned long long' but the argument type is 'unsigned long'. [invalidPrintfArgType_uint]
+        else if (i == 1) fprintf(out, "%llu ", b);
+                         ^
+temp/code_temp.c:62:13: warning: %llu in format string (no. 1) requires 'unsigned long long' but the argument type is 'unsigned long'. [invalidPrintfArgType_uint]
+            fprintf(out, "%llu ", b);
+            ^
+temp/code_temp.c:149:13: warning: %llu in format string (no. 1) requires 'unsigned long long' but the argument type is 'unsigned long'. [invalidPrintfArgType_uint]
+            printf("%llu is %s a Fibonacci number.\n",
+            ^
+temp/code_temp.c:159:13: warning: %llu in format string (no. 1) requires 'unsigned long long' but the argument type is 'unsigned long'. [invalidPrintfArgType_uint]
+            printf("The first Fibonacci number greater than %llu is %llu.\n",
+            ^
+temp/code_temp.c:159:13: warning: %llu in format string (no. 2) requires 'unsigned long long' but the argument type is 'unsigned long'. [invalidPrintfArgType_uint]
+            printf("The first Fibonacci number greater than %llu is %llu.\n",
+            ^
+temp/code_temp.c:17:0: style: The function 'fib_iter' is never used. [unusedFunction]
+static uint64_t fib_iter(uint32_t n) {
+^
+temp/code_temp.c:29:0: style: The function 'fib_fast' is never used. [unusedFunction]
+static uint64_t fib_fast(uint32_t n) {
+^
+temp/code_temp.c:117:0: style: The function 'show_menu' is never used. [unusedFunction]
+static void show_menu(void) {
+^
+nofile:0:0: information: Active checkers: 106/592 (use --checkers-report=<filename> to see details) [checkersReport]
+
+
+Analyzer result: temp/code_temp.c:97:11: style: Condition 'c=='.'' is always false [knownConditionTrueFalse]
+    if (c == '.') {
+          ^
+temp/code_temp.c:116:9: warning: %llu in format string (no. 1) requires 'unsigned long long' but the argument type is 'unsigned long'. [invalidPrintfArgType_uint]
+        fprintf(fp, "%llu ", fib_iter(i));
+        ^
+temp/code_temp.c:124:9: warning: %llu in format string (no. 1) requires 'unsigned long long' but the argument type is 'unsigned long'. [invalidPrintfArgType_uint]
+        fprintf(fp, "%llu ", fib_iter(i));
+        ^
+temp/code_temp.c:186:21: warning: %llu in format string (no. 1) requires 'unsigned long long' but the argument type is 'unsigned long'. [invalidPrintfArgType_uint]
+                    printf("%llu is a Fibonacci number.\n", num);
+                    ^
+temp/code_temp.c:188:21: warning: %llu in format string (no. 1) requires 'unsigned long long' but the argument type is 'unsigned long'. [invalidPrintfArgType_uint]
+                    printf("%llu is not a Fibonacci number.\n", num);
+                    ^
+temp/code_temp.c:109:0: style: The function 'print_fibonacci_to_file' is never used. [unusedFunction]
+static void print_fibonacci_to_file(const char *path, uint32_t n) {
+^
+nofile:0:0: information: Active checkers: 106/592 (use --checkers-report=<filename> to see details) [checkersReport]
+
+
+Analyzer result: temp/code_temp.c:22:212: warning: %llu in format string (no. 1) requires 'unsigned long long' but the argument type is 'unsigned long'. [invalidPrintfArgType_uint]
+static void action_test(void)    { uint64_t num; printf("Enter a number: "); if (!read_uint64(stdin, &num)) { fprintf(stderr, "Error reading input. Please try again.\n"); return; } if (is_perfect_square(num)) { printf("%llu is a Fibonacci number.\n", num); } else { printf("%llu is not a Fibonacci number.\n", num); } }
+                                                                                                                                                                                                                   ^
+temp/code_temp.c:36:9: portability: %d in format string (no. 1) requires 'int' but the argument type is 'size_t {aka unsigned long}'. [invalidPrintfArgType_sint]
+        printf("%d. %s\n", i + 1, menu[i].label);
+        ^
+temp/code_temp.c:121:13: style: Checking if unsigned expression 'num' is less than zero. [unsignedLessThanZero]
+    if (num < 0) return false;
+            ^
+nofile:0:0: information: Active checkers: 106/592 (use --checkers-report=<filename> to see details) [checkersReport]
+
+
+Analyzer result: temp/code_temp.c:105:30: warning: %d in format string (no. 1) requires 'int' but the argument type is 'unsigned int'. [invalidPrintfArgType_sint]
+        if (i == MENU_PRINT) printf("%d: Print Fibonacci sequence up to index %u\n", i + 1, MAX_FIB_INDEX);
+                             ^
+temp/code_temp.c:105:30: warning: %u in format string (no. 2) requires 'unsigned int' but the argument type is 'signed int'. [invalidPrintfArgType_uint]
+        if (i == MENU_PRINT) printf("%d: Print Fibonacci sequence up to index %u\n", i + 1, MAX_FIB_INDEX);
+                             ^
+temp/code_temp.c:106:34: warning: %d in format string (no. 1) requires 'int' but the argument type is 'unsigned int'. [invalidPrintfArgType_sint]
+        else if (i == MENU_QUIT) printf("%d: Quit program\n", i + 1);
+                                 ^
+temp/code_temp.c:19:9: warning: Uninitialized variable: *sum [uninitvar]
+    if (*sum == UINT64_MAX) return false;
+        ^
+temp/code_temp.c:92:29: note: Calling function 'add_safe', 3rd argument '&tmp' value is <Uninit>
+        if (!add_safe(a, b, &tmp)) {
+                            ^
+temp/code_temp.c:19:9: note: Uninitialized variable: *sum
+    if (*sum == UINT64_MAX) return false;
+        ^
+temp/code_temp.c:7:0: style: The function 'read_uint64' is never used. [unusedFunction]
+static bool read_uint64(FILE *fp, uint64_t *out) {
+^
+temp/code_temp.c:39:0: style: The function 'print_fibonacci' is never used. [unusedFunction]
+static void print_fibonacci(FILE *fp, uint32_t n) {
+^
+nofile:0:0: information: Active checkers: 106/592 (use --checkers-report=<filename> to see details) [checkersReport]
+
+
+Analyzer result: temp/code_temp.c:26:17: style: struct member 'menu_item::label' is never used. [unusedStructMember]
+    const char *label;
+                ^
+nofile:0:0: information: Active checkers: 106/592 (use --checkers-report=<filename> to see details) [checkersReport]
+
+
+Analyzer result: temp/code_temp.c:21:0: information: Include file: "fib.h" not found. [missingInclude]
+#include "fib.h"
+^
+temp/code_temp.c:108:0: information: Include file: "fib.h" not found. [missingInclude]
+#include "fib.h"
+^
+temp/code_temp.c:164:0: information: Include file: "fib.h" not found. [missingInclude]
+#include "fib.h"
+^
+temp/code_temp.c:137:13: style: Condition '!input' is always false [knownConditionTrueFalse]
+        if (!input) continue;
+            ^
+temp/code_temp.c:34:5: warning: %llu in format string (no. 1) requires 'unsigned long long' but the argument type is 'unsigned long'. [invalidPrintfArgType_uint]
+    printf("%llu ", n);
+    ^
+temp/code_temp.c:80:19: warning: Uninitialized variable: *b [uninitvar]
+    if (!add_safe(*b, *b, &c)) return false;          /* 2*F(k+1) */
+                  ^
+temp/code_temp.c:42:31: note: Calling function 'fib_pair', 3rd argument '&b' value is <Uninit>
+    if (!fib_pair(n >> 1, &a, &b)) return false;
+                              ^
+temp/code_temp.c:76:11: note: Assuming condition is false
+    if (n == 0) { *a = 0; *b = 1; return true; }
+          ^
+temp/code_temp.c:80:19: note: Uninitialized variable: *b
+    if (!add_safe(*b, *b, &c)) return false;          /* 2*F(k+1) */
+                  ^
+temp/code_temp.c:175:16: style: Unused variable: err [unusedVariable]
+    enum error err;
+               ^
+nofile:0:0: information: Active checkers: 106/592 (use --checkers-report=<filename> to see details) [checkersReport]
+
+
+Analyzer result: temp/code_temp.c:84:0: error: Found an exit path from function with non-void return type that has missing return statement [missingReturn]
+        if (!add_safe(c, d, fn1)) return false;
+^
+temp/code_temp.c:92:0: style: The function 'fib_pair' is never used. [unusedFunction]
+bool fib_pair(uint32_t n, uint64_t *fn, uint64_t *fn1)
+^
+temp/code_temp.c:100:0: style: The function 'is_perfect_square' is never used. [unusedFunction]
+bool is_perfect_square(uint64_t n)
+^
+nofile:0:0: information: Active checkers: 106/592 (use --checkers-report=<filename> to see details) [checkersReport]
+
+
+Analyzer result: temp/code_temp.c:98:22: warning: Either the condition 'choice<0' is redundant or the array 'menu[3]' is accessed at index -1, which is out of bounds. [negativeIndex]
+        int rc = menu[choice-1].handler(10); /* demo uses index 10 */
+                     ^
+temp/code_temp.c:95:20: note: Assuming that condition 'choice<0' is not redundant
+        if (choice < 0)
+                   ^
+temp/code_temp.c:98:22: note: Negative array index
+        int rc = menu[choice-1].handler(10); /* demo uses index 10 */
+                     ^
+temp/code_temp.c:40:5: warning: %llu in format string (no. 2) requires 'unsigned long long' but the argument type is 'unsigned long'. [invalidPrintfArgType_uint]
+    printf("Next after F(%u) = %llu is %llu\n", n, *fn, *fn+1);
+    ^
+temp/code_temp.c:40:5: warning: %llu in format string (no. 3) requires 'unsigned long long' but the argument type is 'unsigned long'. [invalidPrintfArgType_uint]
+    printf("Next after F(%u) = %llu is %llu\n", n, *fn, *fn+1);
+    ^
+temp/code_temp.c:63:5: warning: %llu in format string (no. 1) requires 'unsigned long long' but the argument type is 'unsigned long'. [invalidPrintfArgType_uint]
+    printf("Next after F(%llu) = %llu is %llu\n", (uint64_t)index, f, fp1);
+    ^
+temp/code_temp.c:63:5: warning: %llu in format string (no. 2) requires 'unsigned long long' but the argument type is 'unsigned long'. [invalidPrintfArgType_uint]
+    printf("Next after F(%llu) = %llu is %llu\n", (uint64_t)index, f, fp1);
+    ^
+temp/code_temp.c:63:5: warning: %llu in format string (no. 3) requires 'unsigned long long' but the argument type is 'unsigned long'. [invalidPrintfArgType_uint]
+    printf("Next after F(%llu) = %llu is %llu\n", (uint64_t)index, f, fp1);
+    ^
+temp/code_temp.c:71:5: warning: %llu in format string (no. 1) requires 'unsigned long long' but the argument type is 'unsigned long'. [invalidPrintfArgType_uint]
+    printf("F(%llu) = %llu is %s a perfect square.\n", (uint64_t)index, f,
+    ^
+temp/code_temp.c:71:5: warning: %llu in format string (no. 2) requires 'unsigned long long' but the argument type is 'unsigned long'. [invalidPrintfArgType_uint]
+    printf("F(%llu) = %llu is %s a perfect square.\n", (uint64_t)index, f,
+    ^
+temp/code_temp.c:24:6: warning: Possible null pointer dereference: fn [nullPointer]
+    *fn  = fib_table[n];
+     ^
+temp/code_temp.c:53:26: note: Calling function 'fib_pair', 2nd argument 'NULL' value is 0
+        if (!fib_pair(i, NULL, NULL))
+                         ^
+temp/code_temp.c:24:6: note: Null pointer dereference
+    *fn  = fib_table[n];
+     ^
+temp/code_temp.c:25:6: warning: Possible null pointer dereference: fn1 [nullPointer]
+    *fn1 = fib_table[n+1];
+     ^
+temp/code_temp.c:69:30: note: Calling function 'fib_pair', 3rd argument 'NULL' value is 0
+    if (!fib_pair(index, &f, NULL))
+                             ^
+temp/code_temp.c:14:11: note: Assuming condition is false
+    if (n > FIB_TABLE_MAX_INDEX) return false;
+          ^
+temp/code_temp.c:25:6: note: Null pointer dereference
+    *fn1 = fib_table[n+1];
+     ^
+temp/code_temp.c:29:0: style: The function 'print_fibonacci' is never used. [unusedFunction]
+int print_fibonacci(uint32_t n) {
+^
+temp/code_temp.c:37:0: style: The function 'next_fibonacci' is never used. [unusedFunction]
+int next_fibonacci(uint32_t n, uint64_t *fn) {
+^
+nofile:0:0: information: Active checkers: 106/592 (use --checkers-report=<filename> to see details) [checkersReport]
+
+
+Analyzer result: temp/code_temp.c:1:17: error: The code contains unhandled character(s) (character code=226). Neither unicode nor extended ascii is supported. [syntaxError]
+**Fibonacci Nim – A Two‑Player Console Game (Python)**
+                ^
+nofile:0:0: information: Unmatched suppression: missingIncludeSystem [unmatchedSuppression]
+
+nofile:0:0: information: Active checkers: There was critical errors (use --checkers-report=<filename> to see details) [checkersReport]
+
+
+Analyzer result: temp/code_temp.c:1:28: error: The code contains unhandled character(s) (character code=226). Neither unicode nor extended ascii is supported. [syntaxError]
+Below is a **complete, self‑contained Python program** that implements a two‑player “Fibonacci Nim” game.
+                           ^
+nofile:0:0: information: Unmatched suppression: missingIncludeSystem [unmatchedSuppression]
+
+nofile:0:0: information: Active checkers: There was critical errors (use --checkers-report=<filename> to see details) [checkersReport]
+
+
+Analyzer result: temp/code_temp.c:1:26: error: The code contains unhandled character(s) (character code=226). Neither unicode nor extended ascii is supported. [syntaxError]
+Below is a **single, self‑contained Python script** that implements a two‑player “Fibonacci Nim” game.
+                         ^
+nofile:0:0: information: Unmatched suppression: missingIncludeSystem [unmatchedSuppression]
+
+nofile:0:0: information: Active checkers: There was critical errors (use --checkers-report=<filename> to see details) [checkersReport]
+
+
+Analyzer result: temp/code_temp.c:268:9: style: Unused variable: opt [unusedVariable]
+    int opt;
+        ^
+nofile:0:0: information: Active checkers: 106/592 (use --checkers-report=<filename> to see details) [checkersReport]
+
+
+Analyzer result: temp/code_temp.c:340:17: error: Memory leak: g.moves [memleak]
+                return EXIT_FAILURE;
+                ^
+temp/code_temp.c:150:29: style: Parameter 'g' can be declared as pointer to const [constParameterPointer]
+static int human_move(Game *g)
+                            ^
+temp/code_temp.c:284:11: style: Variable 'token' can be declared as pointer to const [constVariablePointer]
+    char *token = strtok(copy, " ");
+          ^
+nofile:0:0: information: Active checkers: 106/592 (use --checkers-report=<filename> to see details) [checkersReport]
+
+

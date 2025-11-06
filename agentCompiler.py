@@ -3,6 +3,7 @@ import subprocess
 import re
 import requests
 import json
+import os
 
 class AgentCompiler(agent.AgentAI):
     '''This class uses the LLM model together with a gcc compiler to compile
@@ -11,7 +12,7 @@ class AgentCompiler(agent.AgentAI):
     def __init__(self, server_address, model_name, trials):
         self.server_address = server_address        # address of the server
         self.model_name = model_name                # name of the model 
-        self.url = f'{self.server_address}/api/chat'    # chat API endpoint
+        self.url = f'{self.server_address}'    # chat API endpoint
         self.__response = ""                    # response from the model
         self.__mdCode = ""                      # markdown code block, which is part of the response
         self.__code = ""                        # just the code from the markdown code block   
@@ -89,6 +90,9 @@ class AgentCompiler(agent.AgentAI):
         }
 
         headers = {'Content-Type': 'application/json'}
+        api_key = os.getenv('OPENAI_API_KEY', '')
+        if api_key:
+            headers['Authorization'] = f'Bearer {api_key}'
 
         retries = 3
         for attempt in range(retries):
@@ -103,7 +107,7 @@ class AgentCompiler(agent.AgentAI):
                     response_dict = json.loads(response.text)
 
                     # since the response contains a lot of other things, we need to extract the content
-                    response_raw = response_dict['message']['content']
+                    response_raw = response_dict['choices'][0]['message']['content']
 
                     # this is the difference to the parent class
                     # we do NOT add the response to the messages list
@@ -129,6 +133,9 @@ class AgentCompiler(agent.AgentAI):
             "temperature": 0.0,
         }
         headers = {'Content-Type': 'application/json'}
+        api_key = os.getenv('OPENAI_API_KEY', '')
+        if api_key:
+            headers['Authorization'] = f'Bearer {api_key}'
 
         # we use three retries just in case the server is busy
         # or there is a timeout
@@ -148,7 +155,7 @@ class AgentCompiler(agent.AgentAI):
                     response_dict = json.loads(response.text)
 
                     # since the response contains a lot of other things, we need to extract the content
-                    response_raw = response_dict['message']['content']
+                    response_raw = response_dict['choices'][0]['message']['content']
 
                     return response_raw
                 else:

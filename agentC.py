@@ -3,6 +3,7 @@ import subprocess
 import re
 import requests
 import json
+import os
 from agentCompiler import AgentCompiler
 from agentStaticAnalyzer import AgentStaticAnalyzer
 
@@ -20,15 +21,17 @@ class AgentAIC(agent.AgentAI):
     1. The first one is the main conversation between the model and the user.
     2. The second one is the conversation between the model and the user that is aimed to solve compilation errors.'''
 
-    def __init__(self, server_address, model_name, my_role):
+    def __init__(self, server_address, model_name, my_role, max_tokens=16000, api_key=""):
         self.server_address = server_address        # address of the server
         self.model_name = model_name                # name of the model 
-        self.url = f'{self.server_address}/api/chat'    # chat API endpoint
+        self.url = f'{self.server_address}'    # chat API endpoint
         self.__response = ""                    # response from the model
         self.__mdCode = ""                      # markdown code block, which is part of the response
         self.__code = ""                        # just the code from the markdown code block   
         self.__compile_result = ""              # result of the compilation using gcc
-        
+        self.max_tokens = max_tokens              # maximum tokens for the response
+        self.api_key = api_key                    # API key for authentication
+
         # the main conversation between the model
         self.messages = [                   
             {"role": "system",
@@ -49,10 +52,13 @@ class AgentAIC(agent.AgentAI):
             "messages": self.messages,
             "stream": False,
             "temperature": 0.3,             # adjust this parameter to control the randomness of the output
-            "max_tokens": 8196,             # adjust this parameter to control the length of the output
+            "max_tokens": 16000,             # adjust this parameter to control the length of the output
         }
 
         headers = {'Content-Type': 'application/json'}
+        
+        if self.api_key:
+            headers['Authorization'] = f'Bearer {self.api_key}'
 
         retries = 3
         for attempt in range(retries):
@@ -67,7 +73,7 @@ class AgentAIC(agent.AgentAI):
                     response_dict = json.loads(response.text)
 
                     # since the response contains a lot of other things, we need to extract the content
-                    response_raw = response_dict['message']['content']
+                    response_raw = response_dict['choices'][0]['message']['content']
 
                     # this is the difference to the parent class
                     # now we need to ask the compiler agent to compile the code
@@ -76,22 +82,14 @@ class AgentAIC(agent.AgentAI):
                     agentComp = AgentCompiler(server_address=self.server_address, 
                                               model_name=self.model_name, 
                                               trials=3)
-                    agentAnalyzer = AgentStaticAnalyzer(server_address=self.server_address, 
-                                              model_name=self.model_name, 
-                                              trials=3)
 
-                    strCodeResponse = agentComp.get_response(response_raw)
-                    print("going into SA")
-                    strCodeResponse2 = agentAnalyzer.get_response(response_raw)
-                    print(f'SA: {strCodeResponse2[:100]}')
-                    strCodeResponse3 = strCodeResponse + "¤¤¤¤¤" + strCodeResponse2
-                   
 
-                    
+                    strCompilerResponse = agentComp.get_response(response_raw)
+                    strCodeResponse = self.__get_code(strCompilerResponse)  
+
                     # add the response to the messages list
-                    self.messages.append({"role": "assistant", "content": strCodeResponse3})
-                    agentAnalyzer.save_to_excel("static_analysis_log.xlsx")
-
+                    self.messages.append({"role": "assistant", "content": strCodeResponse})
+                    
                     # contrary to the parent class, we need to return the code
                     # and not the response
                     return strCodeResponse

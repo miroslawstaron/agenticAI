@@ -46,7 +46,7 @@ class AgentCompiler(agent.AgentAI):
         # compile the code using gcc
         self.__compile_result = self.__compile_code(code)
 
-        print(f'Compiling the code: {self.__code}')
+        #print(f'Compiling the code: {self.__code}')
 
         # if the compilation was successful, we return the result
         if self.__compile_result == "Compilation successful":
@@ -55,7 +55,9 @@ class AgentCompiler(agent.AgentAI):
             # if the compilation was not successful, we try to fix it
             attempts = 0
             while attempts < self.__trials and self.__compile_result != "Compilation successful":
+                print(f'Attempt {attempts + 1} to fix the compilation error...')
                 self.__solve_problem()
+                attempts += 1
             return self.__code
 
     def __solve_problem(self) -> str:

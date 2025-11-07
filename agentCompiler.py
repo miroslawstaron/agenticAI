@@ -56,7 +56,7 @@ class AgentCompiler(agent.AgentAI):
             attempts = 0
             while attempts < self.__trials and self.__compile_result != "Compilation successful":
                 self.__solve_problem()
-            return self.__compile_result
+            return self.__code
 
     def __solve_problem(self) -> str:
         '''This method solves the compilation problems using the model.
@@ -72,55 +72,6 @@ class AgentCompiler(agent.AgentAI):
         # get the response from the model
         strResult = self.__get_response_compilation(strPrompt)
         return strResult
-
-    def get_response(self, prompt):
-        '''This method gets the response from the model.
-        It sends the prompt to the model and returns the response.'''
-        # send a request to the ollama server
-        
-        # add the user prompt to the messages list
-        self.messages.append({"role": "user", "content": prompt})
-
-        data = {
-            "model": self.model_name,
-            "messages": self.messages,
-            "stream": False,
-            "temperature": 0.3,             # adjust this parameter to control the randomness of the output
-            "max_tokens": 2096,             # adjust this parameter to control the length of the output
-        }
-
-        headers = {'Content-Type': 'application/json'}
-        api_key = os.getenv('OPENAI_API_KEY', '')
-        if api_key:
-            headers['Authorization'] = f'Bearer {api_key}'
-
-        retries = 3
-        for attempt in range(retries):
-            try:
-                response = requests.post(self.url,
-                                        headers=headers,
-                                        json=data,
-                                        timeout=300)
-
-                if response.status_code == 200:
-                    # get the response from the server
-                    response_dict = json.loads(response.text)
-
-                    # since the response contains a lot of other things, we need to extract the content
-                    response_raw = response_dict['choices'][0]['message']['content']
-
-                    # this is the difference to the parent class
-                    # we do NOT add the response to the messages list
-                    return response_raw
-                else:
-                    # on error, we print the error message
-                    print(f"Error: {response.status_code} - {response.text}")
-                    return None
-            except requests.exceptions.Timeout:
-                print(f"Timeout occurred. Retrying {attempt + 1}/{retries}...")
-                if attempt == retries - 1:
-                    print("Max retries reached. Exiting.")
-                    return None
 
     def __get_response_compilation(self, prompt: str) -> str:
         '''This method gets the response from the model. 

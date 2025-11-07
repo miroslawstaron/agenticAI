@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # use the agent.py file to run the agent
 import argparse
 import re
@@ -31,12 +32,12 @@ def main():
     args = parser.parse_args()
 
     # Create an instance of the Agent class
-    agentDesigner = AgentAI(server_address="http://lazythought.cse.chalmers.se/v1/chat/completions", 
-                              model_name="gpt-oss:20b",
+    agentDesigner = AgentAI(server_address="http://deepestthought.cse.chalmers.se:11434/v1/chat/completions", 
+                              model_name="gemma3:latest",
                               my_role="You are an experienced software designer. You must help the programmer to solve their task. You respond with suggestions, not solutions.")
 
-    agentProgrammer = AgentAIC(server_address="http://lazythought.cse.chalmers.se/v1/chat/completions", 
-                            model_name="gpt-oss:20b",
+    agentProgrammer = AgentAIC(server_address="http://deepestthought.cse.chalmers.se:11434/v1/chat/completions", 
+                            model_name="gemma3:latest",
                             max_tokens=16000,
                             my_role="You are an experienced programmer. You must solve the task given by the designer and follow the instructions from the designer. You respond with solutions, not suggestions.")
 

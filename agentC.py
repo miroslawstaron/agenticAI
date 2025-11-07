@@ -84,8 +84,8 @@ class AgentAIC(agent.AgentAI):
                                               trials=3)
 
 
-                    strCompilerResponse = agentComp.get_response(response_raw)
-                    strCodeResponse = self.__get_code(strCompilerResponse)  
+                    #strCompilerResponse = agentComp.get_response(response_raw)
+                    strCodeResponse = agentComp.get_response(response_raw)
 
                     # add the response to the messages list
                     self.messages.append({"role": "assistant", "content": strCodeResponse})

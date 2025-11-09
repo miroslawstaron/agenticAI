@@ -1,0 +1,8 @@
+# Python dependencies for the agenticAI project
+pandas
+requests
+tqdm
+vllm
+PyPDF2
+openpyxl
+re

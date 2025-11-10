@@ -96,7 +96,7 @@ class AgentAIC(agent.AgentAI):
                 else:
                     # on error, we print the error message
                     print(f"Error: {response.status_code} - {response.text}")
-                    return None
+                    #return None
             except requests.exceptions.Timeout:
                 print(f"Timeout occurred. Retrying {attempt + 1}/{retries}...")
                 if attempt == retries - 1:

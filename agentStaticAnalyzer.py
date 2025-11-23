@@ -23,11 +23,15 @@ class AgentStaticAnalyzer(agent.AgentAI):
         self.logs = []                   # number of trials to fix the compilation errors
         self.api_key = os.getenv('OPENAI_API_KEY', '')
         
-        # Set litellm configuration for custom base URLs
+        # LiteLLM expects base URL without the /chat/completions or /v1/chat/completions endpoint
+        # Strip common endpoints if present
+        self.api_base = server_address
         if server_address:
-            os.environ["OPENAI_API_BASE"] = server_address
-        if self.api_key:
-            os.environ["OPENAI_API_KEY"] = self.api_key
+            # Remove trailing endpoint paths that LiteLLM adds automatically
+            for endpoint in ['/v1/chat/completions', '/chat/completions', '/v1']:
+                if server_address.endswith(endpoint):
+                    self.api_base = server_address[:-len(endpoint)]
+                    break
         
 
         # initial compile messages queue
@@ -100,7 +104,7 @@ class AgentStaticAnalyzer(agent.AgentAI):
                     model=self.model_name,
                     messages=self.__analyzer_messages,
                     temperature=0.0,
-                    api_base=self.server_address if self.server_address else None,
+                    api_base=self.api_base if self.api_base else None,
                     api_key=self.api_key if self.api_key else None,
                     timeout=300
                 )

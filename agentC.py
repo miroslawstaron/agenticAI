@@ -31,11 +31,15 @@ class AgentAIC(agent.AgentAI):
         self.max_tokens = max_tokens              # maximum tokens for the response
         self.api_key = api_key if api_key else os.getenv('OPENAI_API_KEY', '')
         
-        # Set litellm configuration for custom base URLs
+        # LiteLLM expects base URL without the /chat/completions or /v1/chat/completions endpoint
+        # Strip common endpoints if present
+        self.api_base = server_address
         if server_address:
-            os.environ["OPENAI_API_BASE"] = server_address
-        if self.api_key:
-            os.environ["OPENAI_API_KEY"] = self.api_key
+            # Remove trailing endpoint paths that LiteLLM adds automatically
+            for endpoint in ['/v1/chat/completions', '/chat/completions', '/v1']:
+                if server_address.endswith(endpoint):
+                    self.api_base = server_address[:-len(endpoint)]
+                    break
 
         # the main conversation between the model
         self.messages = [                   
@@ -60,7 +64,7 @@ class AgentAIC(agent.AgentAI):
                     messages=self.messages,
                     temperature=0.3,
                     max_tokens=16000,
-                    api_base=self.server_address if self.server_address else None,
+                    api_base=self.api_base if self.api_base else None,
                     api_key=self.api_key if self.api_key else None,
                     timeout=300
                 )

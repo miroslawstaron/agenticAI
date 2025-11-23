@@ -367,3 +367,21 @@ temp/code_temp.c:284:11: style: Variable 'token' can be declared as pointer to c
 nofile:0:0: information: Active checkers: 106/592 (use --checkers-report=<filename> to see details) [checkersReport]
 
 
+Analyzer result: Static Analyzer Issue: ./temp/code_temp.c:1: warning: something
+
+Analyzer result: Static Analyzer Issue: ./temp/code_temp.c:1: style: Variable x is not used
+
+Analyzer result: Static Analyzer Issue: ./temp/code_temp.c:1: warning: something
+
+Analyzer result: Static Analyzer Issue: ./temp/code_temp.c:1: style: Variable x is not used
+
+Analyzer result: Static Analyzer Issue: ./temp/code_temp.c:1: warning: something
+
+Analyzer result: Static Analyzer Issue: ./temp/code_temp.c:1: style: Variable x is not used
+
+Analyzer result: Static Analyzer Issue: ./temp/code_temp.c:1: warning: something
+
+Analyzer result: Static Analyzer Issue: ./temp/code_temp.c:1: style: Variable x is not used
+
+Analyzer result: Static Analyzer Issue: ./temp/code_temp.c:1: warning: something
+

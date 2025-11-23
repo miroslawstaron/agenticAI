@@ -6,3 +6,4 @@ vllm
 PyPDF2
 openpyxl
 re
+litellm

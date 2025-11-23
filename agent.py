@@ -1,7 +1,8 @@
 import json
-import requests
 import pandas as pd
 import re
+from litellm import completion
+import os
 
 class AgentAI:
     
@@ -17,10 +18,16 @@ class AgentAI:
                  api_key=""):
         self.server_address = server_address
         self.model_name = model_name
-        self.url = f'{self.server_address}'
         self.max_tokens = max_tokens
         # Prefer explicit api_key; else fall back to env var OPENAI_API_KEY
-        self.api_key = api_key
+        self.api_key = api_key if api_key else os.getenv('OPENAI_API_KEY', '')
+        
+        # Set litellm configuration for custom base URLs
+        if server_address:
+            os.environ["OPENAI_API_BASE"] = server_address
+        if self.api_key:
+            os.environ["OPENAI_API_KEY"] = self.api_key
+            
         self.messages = [
             {"role": "system",
              "content": my_role 
@@ -28,46 +35,32 @@ class AgentAI:
         ] 
 
     def get_response(self, prompt):
-        # send a request to the ollama server
-        
         # add the user prompt to the messages list
         self.messages.append({"role": "user", "content": prompt})
-
-        data = {
-            "model": self.model_name,
-            "messages": self.messages,
-            "stream": False,
-            "temperature": 0.5,
-            "max_tokens": self.max_tokens,             # adjust this parameter to control the length of the output
-        }
-        headers = {'Content-Type': 'application/json'}
-        if self.api_key:
-            headers['Authorization'] = f'Bearer {self.api_key}'
 
         retries = 3
         for attempt in range(retries):
             try:
-                response = requests.post(self.url,
-                                        headers=headers,
-                                        json=data,
-                                        timeout=300)
+                # Use litellm's completion function
+                response = completion(
+                    model=self.model_name,
+                    messages=self.messages,
+                    temperature=0.5,
+                    max_tokens=self.max_tokens,
+                    api_base=self.server_address if self.server_address else None,
+                    api_key=self.api_key if self.api_key else None,
+                    timeout=300
+                )
 
-                if response.status_code == 200:
-                    # get the response from the server
-                    response_dict = json.loads(response.text)
+                # Extract the content from the response
+                response_raw = response.choices[0].message.content
 
-                    # since the response contains a lot of other things, we need to extract the content
-                    response_raw = response_dict['choices'][0]['message']['content']
-
-                    # add the response to the messages list
-                    self.messages.append({"role": "assistant", "content": response_raw})
-                    return response_raw
-                else:
-                    # on error, we print the error message
-                    print(f"Error: {response.status_code} - {response.text}")
-                    return None
-            except requests.exceptions.Timeout:
-                print(f"Timeout occurred. Retrying {attempt + 1}/{retries}...")
+                # add the response to the messages list
+                self.messages.append({"role": "assistant", "content": response_raw})
+                return response_raw
+                
+            except Exception as e:
+                print(f"Error occurred: {str(e)}. Retrying {attempt + 1}/{retries}...")
                 if attempt == retries - 1:
                     print("Max retries reached. Exiting.")
                     return None

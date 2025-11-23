@@ -1,10 +1,10 @@
 import agent
 import subprocess
 import re
-import requests
 import json
 import pandas as pd
 import os
+from litellm import completion
 from agentCompiler import AgentCompiler
 
 
@@ -15,13 +15,19 @@ class AgentStaticAnalyzer(agent.AgentAI):
     def __init__(self, server_address, model_name, trials):
         self.server_address = server_address        # address of the server
         self.model_name = model_name                # name of the model 
-        self.url = f'{self.server_address}'    # chat API endpoint
         self.__response = ""                    # response from the model
         self.__mdCode = ""                      # markdown code block, which is part of the response
         self.__code = ""                        # just the code from the markdown code block   
         self.__analyzer_result = ""              # result of the compilation using gcc 
         self.__trials = trials
         self.logs = []                   # number of trials to fix the compilation errors
+        self.api_key = os.getenv('OPENAI_API_KEY', '')
+        
+        # Set litellm configuration for custom base URLs
+        if server_address:
+            os.environ["OPENAI_API_BASE"] = server_address
+        if self.api_key:
+            os.environ["OPENAI_API_KEY"] = self.api_key
         
 
         # initial compile messages queue
@@ -83,47 +89,31 @@ class AgentStaticAnalyzer(agent.AgentAI):
         '''This method gets the response from the model. 
         It sends the prompt to the model and returns the response.'''
         
-        data = {
-            "model": self.model_name,
-            "messages": self.__analyzer_messages,
-            "stream": False,
-            "temperature": 0.0,
-        }
-        headers = {'Content-Type': 'application/json'}
-        api_key = os.getenv('OPENAI_API_KEY', '')
-        if api_key:
-            headers['Authorization'] = f'Bearer {api_key}'
-
         # we use three retries just in case the server is busy
         # or there is a timeout
         retries = 3     
 
-
         for attempt in range(retries):
             try:
-                # communicate with the server
-                response = requests.post(self.url,
-                                        headers=headers,
-                                        json=data,
-                                        timeout=300)
+                # Use litellm's completion function
+                response = completion(
+                    model=self.model_name,
+                    messages=self.__analyzer_messages,
+                    temperature=0.0,
+                    api_base=self.server_address if self.server_address else None,
+                    api_key=self.api_key if self.api_key else None,
+                    timeout=300
+                )
 
-                if response.status_code == 200:
-                    # get the response from the server
-                    response_dict = json.loads(response.text)
-
-                    # since the response contains a lot of other things, we need to extract the content
-                    response_raw = response_dict['choices'][0]['message']['content']
-
-                    return response_raw
-                else:
-                    # on error, we print the error message
-                    print(f"Error: {response.status_code} - {response.text}")
-                    return None
-            except requests.exceptions.Timeout:
-                print(f"Timeout occurred. Retrying {attempt + 1}/{retries}...")
+                # Extract the content from the response
+                response_raw = response.choices[0].message.content
+                return response_raw
+                
+            except Exception as e:
+                print(f"Error occurred: {str(e)}. Retrying {attempt + 1}/{retries}...")
                 if attempt == retries - 1:
                     print("Max retries reached. Exiting.")
-            return None
+                    return None
 
     def __extract_c_code(self, markdown: str) -> str:
         '''This function extracts the C code from a markdown string.'''

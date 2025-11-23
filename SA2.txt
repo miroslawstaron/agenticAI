@@ -1,9 +1,0 @@
-Analyzer result: Static Analysis successful
-Analyzer result: Static Analysis successful
-Analyzer result: Static Analysis successful
-Analyzer result: Static Analysis successful
-Analyzer result: Static Analysis successful
-Analyzer result: Static Analysis successful
-Analyzer result: Static Analysis successful
-Analyzer result: Static Analysis successful
-Analyzer result: Static Analysis successful

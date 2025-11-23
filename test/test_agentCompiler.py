@@ -46,7 +46,11 @@ class TestAgentCompiler(unittest.TestCase):
         mock_result.stdout = b''
         mock_run.return_value = mock_result
 
-        # Set the __code attribute before calling __compile_code
+        # NOTE: Setting __code directly is necessary because the original code at
+        # agentCompiler.py:166 checks `if self.__code != ""` before attempting
+        # compilation. We need to set this to ensure the code path is tested.
+        # Since we cannot modify agent code per requirements, we must set this
+        # private attribute.
         self.agent._AgentCompiler__code = "#include <stdio.h>\nint main() { return 0; }"
         
         code = "#include <stdio.h>\nint main() { return 0; }"
@@ -66,7 +70,7 @@ class TestAgentCompiler(unittest.TestCase):
         mock_result.stdout = b''
         mock_run.return_value = mock_result
 
-        # Set the __code attribute before calling __compile_code
+        # NOTE: Setting __code directly (see test_compile_code_success for explanation)
         self.agent._AgentCompiler__code = "int main() { return 0 }"  # Missing semicolon
         
         code = "int main() { return 0 }"  # Missing semicolon

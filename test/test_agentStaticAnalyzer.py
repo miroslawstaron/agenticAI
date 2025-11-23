@@ -76,7 +76,11 @@ class TestAgentStaticAnalyzer(unittest.TestCase):
 
         code = "```c\n#include <stdio.h>\nint main() { return 0; }\n```"
         
-        # Set the __code attribute before calling __analyze_code to ensure msg is defined
+        # NOTE: Setting __code directly is necessary because the original code at
+        # agentStaticAnalyzer.py:167 checks `if self.__code != ""` before setting
+        # the `msg` variable. Without this, line 198 raises UnboundLocalError.
+        # Since we cannot modify agent code per requirements, we must set this
+        # private attribute to work around the bug.
         self.agent._AgentStaticAnalyzer__code = '#include <stdio.h>\nint main() { return 0; }'
         
         result = self.agent._AgentStaticAnalyzer__analyze_code(code)
@@ -105,7 +109,7 @@ class TestAgentStaticAnalyzer(unittest.TestCase):
 
         code = "```c\nint main() { int x; return 0; }\n```"
         
-        # Set the __code attribute before calling __analyze_code to ensure msg is defined
+        # NOTE: Setting __code directly (see test_analyze_code_success for explanation)
         self.agent._AgentStaticAnalyzer__code = 'int main() { int x; return 0; }'
         
         result = self.agent._AgentStaticAnalyzer__analyze_code(code)

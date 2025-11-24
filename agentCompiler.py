@@ -44,7 +44,7 @@ class AgentCompiler(agent.AgentAI):
             self.__code = code
 
         # compile the code using gcc
-        self.__compile_result = self.__compile_code(code)
+        self.__compile_result = self.__compile_code(self.__code)
 
         #print(f'Compiling the code: {self.__code}')
 
@@ -56,7 +56,16 @@ class AgentCompiler(agent.AgentAI):
             attempts = 0
             while attempts < self.__trials and self.__compile_result != "Compilation successful":
                 print(f'Attempt {attempts + 1} to fix the compilation error...')
-                self.__solve_problem()
+                
+                code = self.__solve_problem()
+                if code.__contains__("```c"):
+                    self.__mdCode = code
+                    self.__code = self.__get_code(code)
+                else:
+                    self.__code = code
+
+                self.__compile_result = self.__compile_code(self.__code)
+
                 attempts += 1
             return self.__code
 
@@ -94,7 +103,6 @@ class AgentCompiler(agent.AgentAI):
         # or there is a timeout
         retries = 3     
 
-
         for attempt in range(retries):
             try:
                 # communicate with the server
@@ -114,12 +122,13 @@ class AgentCompiler(agent.AgentAI):
                 else:
                     # on error, we print the error message
                     print(f"Error: {response.status_code} - {response.text}")
-                    return None
+                    #return None
             except requests.exceptions.Timeout:
                 print(f"Timeout occurred. Retrying {attempt + 1}/{retries}...")
                 if attempt == retries - 1:
                     print("Max retries reached. Exiting.")
-            return None
+                    return None
+    
 
     def __extract_c_code(self, markdown: str) -> str:
         '''This function extracts the C code from a markdown string.'''

@@ -24,11 +24,10 @@ This is a research project that implements multi-agent AI conversations for C co
 
 ### Required Dependencies
 - **pandas**: Data manipulation and Excel file handling
-- **requests**: HTTP client for API calls (legacy, being replaced by litellm)
-- **litellm**: Unified LLM provider interface for OpenAI, Ollama, and other APIs
+- **requests**: HTTP client for API calls to LLM servers
 - **tqdm**: Progress bars for long-running experiments
 - **openpyxl**: Excel file operations
-- **PyPDF2**: PDF parsing for 3GPP document analysis
+- **PyPDF2**: PDF parsing for 3GPP document analysis (used in `requirements/` directory)
 
 ### Optional Dependencies
 - **vllm**: For vLLM-based agent (large dependency, only needed for specific use cases)
@@ -162,10 +161,10 @@ match = re.search(pattern, markdown, re.DOTALL)
 - Implement `get_response(prompt)` method for conversation interaction
 
 ### API Integration
-- Use LiteLLM for unified API access across different providers
+- Use `requests` library for HTTP API calls to LLM servers
 - API keys can be passed explicitly or via `OPENAI_API_KEY` environment variable
 - Explicit API keys take precedence over environment variables
-- Server URLs automatically normalize by stripping `/v1/chat/completions`, `/chat/completions`, or `/v1` suffixes
+- Server URLs should point to the base API endpoint (e.g., `http://deepthought.cse.chalmers.se`)
 
 ### Error Handling
 - Use try-except blocks for API calls with retry logic
@@ -220,7 +219,7 @@ python -c "import agent; import agentC; import agentCompiler"
 
 **Import errors**: Ensure all dependencies are installed
 ```bash
-pip install pandas requests tqdm openpyxl PyPDF2 litellm
+pip install pandas requests tqdm openpyxl PyPDF2
 ```
 
 **API connection failures**: 

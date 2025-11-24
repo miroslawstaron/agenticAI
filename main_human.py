@@ -33,13 +33,13 @@ def main():
 
     # Create an instance of the Agent class
     agentDesigner = AgentAI(server_address="http://deepestthought.cse.chalmers.se:11434/v1/chat/completions", 
-                              model_name="gemma3:latest",
-                              my_role="You are an experienced software designer. You must help the programmer to solve their task. You respond with suggestions, not solutions.")
+                              model_name="gpt-oss:120b",
+                              my_role="You are an experienced C software designer. You must help the programmer to solve their task. You respond with suggestions, not solutions.")
 
-    agentProgrammer = AgentAIC(server_address="http://deepestthought.cse.chalmers.se:11434/v1/chat/completions", 
+    agentProgrammer = AgentAI(server_address="http://deepestthought.cse.chalmers.se:11434/v1/chat/completions", 
                             model_name="gemma3:latest",
                             max_tokens=16000,
-                            my_role="You are an experienced programmer. You must solve the task given by the designer and follow the instructions from the designer. You respond with solutions, not suggestions.")
+                            my_role="You are an experienced C programmer. You must solve the task given by the designer and follow the instructions from the designer. You respond with solutions, not suggestions.")
 
     # Conversation log: list of dicts with iteration, role, prompt and response
     conversation_log = []
@@ -86,7 +86,7 @@ def main():
         iteration = i + 1
 
         # Prompt programmer with latest designer message
-        prompt_to_programmer = f'For your program, the designer suggested: {responseDesigner}. The human provided feedback: {responseHuman}. Address these points in your next solution.'
+        prompt_to_programmer = f'For your program, the designer suggested: {responseDesigner}. \n The human provided feedback: {responseHuman}. Address these points in your next solution.'
 
         responseProgrammer = agentProgrammer.get_response(prompt_to_programmer)
         # Log programmer response for this iteration

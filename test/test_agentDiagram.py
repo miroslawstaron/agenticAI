@@ -6,6 +6,7 @@ import tempfile
 import json
 from unittest.mock import Mock, patch, MagicMock
 import pandas as pd
+import requests
 
 # Add parent directory to path to import agent module
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -335,10 +336,6 @@ classDiagram
             # Clean up
             if os.path.exists(tmp_filename):
                 os.remove(tmp_filename)
-
-
-# Required to avoid import errors with requests
-import requests
 
 
 if __name__ == '__main__':

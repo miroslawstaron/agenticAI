@@ -21,13 +21,6 @@ class AgentDiagram(agent.AgentAI):
             max_tokens: Maximum tokens for the response
             api_key: API key for authentication
         """
-        self.server_address = server_address
-        self.model_name = model_name
-        self.url = f'{self.server_address}'
-        self.diagram_type = diagram_type
-        self.max_tokens = max_tokens
-        self.api_key = api_key
-        
         # Define the role based on diagram type
         role_descriptions = {
             "class": "You are an expert at analyzing source code and creating Mermaid class diagrams. Generate only the Mermaid diagram syntax in a ```mermaid code block, no explanations.",
@@ -38,10 +31,11 @@ class AgentDiagram(agent.AgentAI):
         
         my_role = role_descriptions.get(diagram_type, role_descriptions["class"])
         
-        # Initialize messages with system role
-        self.messages = [
-            {"role": "system", "content": my_role}
-        ]
+        # Call parent constructor
+        super().__init__(server_address, model_name, my_role, max_tokens, api_key)
+        
+        # Store diagram type for later use
+        self.diagram_type = diagram_type
 
     def get_response(self, source_code):
         """Generate a Mermaid diagram from source code.

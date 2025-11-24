@@ -64,22 +64,22 @@ Note: The `vllm` library is optional. Tests for `vllmAgentAI` will be skipped if
 
 ```bash
 # From the repository root
-python -m unittest discover -s test -p "test_*.py" -v
+python3 -m unittest discover -s test -p "test_*.py" -v
 ```
 
 ### Run Specific Test File
 
 ```bash
-python -m unittest test.test_agent -v
-python -m unittest test.test_agentC -v
-python -m unittest test.test_agentCompiler -v
+python3 -m unittest test.test_agent -v
+python3 -m unittest test.test_agentC -v
+python3 -m unittest test.test_agentCompiler -v
 # ... etc
 ```
 
 ### Run Specific Test Case
 
 ```bash
-python -m unittest test.test_agent.TestAgentAI.test_initialization -v
+python3 -m unittest test.test_agent.TestAgentAI.test_initialization -v
 ```
 
 ## Test Design

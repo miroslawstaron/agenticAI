@@ -3,6 +3,70 @@
 ## Project Overview
 This is a research project that implements multi-agent AI conversations for C code generation and analysis. The system creates designer-programmer conversations between different LLM models to study iterative code improvement, compilation success rates, and conversation patterns.
 
+## Development Setup
+
+### Prerequisites
+- Python 3.8 or higher
+- gcc compiler (for C code compilation features)
+- Git
+
+### Installation
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/miroslawstaron/agenticAI.git
+   cd agenticAI
+   ```
+
+2. Install Python dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+### Required Dependencies
+- **pandas**: Data manipulation and Excel file handling
+- **requests**: HTTP client for API calls (legacy, being replaced by litellm)
+- **litellm**: Unified LLM provider interface for OpenAI, Ollama, and other APIs
+- **tqdm**: Progress bars for long-running experiments
+- **openpyxl**: Excel file operations
+- **PyPDF2**: PDF parsing for 3GPP document analysis
+
+### Optional Dependencies
+- **vllm**: For vLLM-based agent (large dependency, only needed for specific use cases)
+
+### Environment Variables
+Set the `OPENAI_API_KEY` environment variable when using OpenAI or compatible APIs:
+```bash
+export OPENAI_API_KEY="your_api_key_here"
+```
+
+## Testing
+
+### Running Tests
+Use Python's built-in unittest framework:
+
+```bash
+# Run all tests
+python -m unittest discover -s test -p "test_*.py" -v
+
+# Run specific test file
+python -m unittest test.test_agent -v
+
+# Run specific test case
+python -m unittest test.test_agent.TestAgentAI.test_initialization -v
+```
+
+### Test Structure
+- All tests are in the `/test` directory
+- Test files follow the naming pattern `test_*.py`
+- Tests use extensive mocking to avoid live API dependencies
+- Temporary files are created in `./temp` directory and cleaned up after tests
+
+### Writing Tests
+- Use Python's `unittest` framework
+- Mock external dependencies (API calls, file I/O, subprocess calls)
+- Follow existing test patterns in `test/test_agent.py` as reference
+- Each test should be independent and clean up after itself
+
 ## Core Architecture
 
 ### Agent System (`agent.py`, `agentC.py`, `agentCompiler.py`)
@@ -76,3 +140,122 @@ match = re.search(pattern, markdown, re.DOTALL)
 - Excel files can become large (>50MB) with extensive conversations
 - Compilation requires gcc and math library (`-lm` flag)
 - Timeout handling essential for model server reliability (300s default)
+
+## Code Style and Conventions
+
+### Python Style
+- Follow PEP 8 style guidelines
+- Use 4 spaces for indentation (no tabs)
+- Maximum line length: 100 characters (flexible for readability)
+- Use descriptive variable names
+
+### Naming Conventions
+- **Classes**: PascalCase (e.g., `AgentAI`, `AgentCompiler`)
+- **Functions/Methods**: snake_case (e.g., `get_response`, `save_to_excel`)
+- **Constants**: UPPER_SNAKE_CASE (e.g., `MAX_ITERATIONS`)
+- **Private attributes**: Prefix with underscore (e.g., `_internal_state`)
+
+### Agent Design Patterns
+- All agent classes should inherit from `AgentAI` base class
+- Maintain conversation history in `self.messages` list
+- Use role-based message structure: `{"role": "system|user|assistant", "content": "..."}`
+- Implement `get_response(prompt)` method for conversation interaction
+
+### API Integration
+- Use LiteLLM for unified API access across different providers
+- API keys can be passed explicitly or via `OPENAI_API_KEY` environment variable
+- Explicit API keys take precedence over environment variables
+- Server URLs automatically normalize by stripping `/v1/chat/completions`, `/chat/completions`, or `/v1` suffixes
+
+### Error Handling
+- Use try-except blocks for API calls with retry logic
+- Default timeout: 300 seconds for API requests
+- Implement exponential backoff for retries (typically 3 retries)
+- Log errors appropriately for debugging
+
+### File Operations
+- Use pandas for Excel file operations (`.xlsx` format)
+- Support both CSV and Excel export formats
+- Clean up temporary files (especially in `/temp` directory)
+- Use descriptive filenames with model names and timestamps
+
+## Common Commands
+
+### Running Experiments
+```bash
+# Basic designer-programmer conversation
+python main.py --prompt "Your task description"
+
+# With compilation validation
+python main_agentc.py --prompt "Generate C code for sorting"
+
+# Human-in-the-loop mode
+python main_human.py --prompt "Code review task"
+```
+
+### Data Analysis
+```bash
+# Convert conversation to HTML
+python convert_to_html.py input.xlsx output.html
+
+# Analyze conversations (Jupyter notebook)
+jupyter notebook analyze.ipynb
+```
+
+### Development
+```bash
+# Install dependencies
+pip install -r requirements.txt
+
+# Run tests
+python -m unittest discover -s test -p "test_*.py" -v
+
+# Check for import errors
+python -c "import agent; import agentC; import agentCompiler"
+```
+
+## Troubleshooting
+
+### Common Issues
+
+**Import errors**: Ensure all dependencies are installed
+```bash
+pip install pandas requests tqdm openpyxl PyPDF2 litellm
+```
+
+**API connection failures**: 
+- Verify server URL is accessible
+- Check API key is set correctly
+- Ensure model is available on the server (for Ollama, use `ollama list`)
+
+**Compilation errors**:
+- Ensure gcc is installed and accessible
+- Math library (`-lm`) is required for mathematical functions
+- Check that `/temp` directory exists and is writable
+
+**Excel file corruption**:
+- Large conversation files may cause memory issues
+- Consider saving intermediate results more frequently
+- Use CSV format for very large datasets
+
+## Best Practices
+
+### When Adding New Agents
+1. Inherit from `AgentAI` base class
+2. Implement required methods: `__init__`, `get_response`
+3. Add corresponding test file in `/test` directory
+4. Update this documentation with agent description
+5. Follow existing patterns for message handling and API integration
+
+### When Modifying Existing Code
+1. Run tests before and after changes
+2. Maintain backward compatibility for conversation exports
+3. Update documentation if changing public APIs
+4. Use mocking in tests to avoid external dependencies
+
+### When Running Experiments
+1. Use descriptive prompts and task descriptions
+2. Set appropriate `MAX_ITERATIONS` based on experiment scope
+3. Monitor Excel file sizes for long-running experiments
+4. Save intermediate results to prevent data loss
+5. Use version control for experimental scripts

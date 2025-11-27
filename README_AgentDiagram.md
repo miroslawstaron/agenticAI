@@ -2,12 +2,14 @@
 
 ## Overview
 
-`AgentDiagram` is an agent that generates Mermaid diagrams from source code using Large Language Models (LLMs). It analyzes source code and produces various types of diagrams in Mermaid syntax.
+`AgentDiagram` is an agent that generates Mermaid diagrams from source code using Large Language Models (LLMs). It analyzes source code and produces various types of diagrams in Mermaid syntax. **Now includes automatic validation and iterative error fixing** to ensure generated diagrams are syntactically correct.
 
 ## Features
 
 - **Multiple diagram types**: class, flowchart, sequence, and entity-relationship (ER) diagrams
-- **Default diagram type**: Class diagram
+- **Automatic validation**: Uses mermaid-cli to validate generated diagrams
+- **Iterative error fixing**: Automatically asks the LLM to fix compilation errors (up to 5 attempts)
+- **PNG conversion**: Convert diagrams to PNG format
 - **Dynamic type switching**: Change diagram types on-the-fly
 - **Mermaid syntax extraction**: Automatically extracts Mermaid code from LLM responses
 - **Conversation history**: Maintains conversation context like other agents
@@ -24,7 +26,11 @@
 The agent requires the same dependencies as other agents in the project:
 
 ```bash
+# Python dependencies
 pip install pandas requests tqdm openpyxl
+
+# Optional: Install mermaid-cli for validation and PNG conversion
+npm install -g @mermaid-js/mermaid-cli
 ```
 
 ## Usage
@@ -50,10 +56,40 @@ class Vehicle {
 };
 """
 
-# Generate diagram
+# Generate diagram (without validation)
 response = agent.get_response(source_code)
 diagram = agent.extract_mermaid_diagram(response)
 print(diagram)
+```
+
+### With Validation (Recommended)
+
+```python
+# Generate diagram with automatic validation and error fixing
+response = agent.get_response(
+    source_code,
+    validate=True,         # Enable validation
+    max_fix_attempts=5     # Try to fix errors up to 5 times (default)
+)
+
+diagram = agent.extract_mermaid_diagram(response)
+```
+
+**How validation works:**
+
+1. **Generation**: LLM generates a mermaid diagram
+2. **Validation**: Diagram is compiled using `mmdc` (mermaid-cli)
+3. **Error Detection**: If compilation fails, errors are captured
+4. **Iterative Fixing**: Errors are sent back to the LLM with a fix request
+5. **Retry Loop**: Steps 2-4 repeat up to `max_fix_attempts` times
+6. **Result**: Returns either a valid diagram or the last attempt
+
+**Example output:**
+```
+✗ Mermaid diagram validation failed (attempt 1/5)
+Error: Parse error on line 3: Invalid syntax in class definition
+Requesting fix from model...
+✓ Mermaid diagram validation successful!
 ```
 
 ### Specifying Diagram Type

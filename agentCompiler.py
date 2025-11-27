@@ -1,7 +1,7 @@
 import agent
 import subprocess
 import re
-import requests
+from litellm import completion
 import json
 import os
 
@@ -12,7 +12,6 @@ class AgentCompiler(agent.AgentAI):
     def __init__(self, server_address, model_name, trials):
         self.server_address = server_address        # address of the server
         self.model_name = model_name                # name of the model 
-        self.url = f'{self.server_address}'    # chat API endpoint
         self.__response = ""                    # response from the model
         self.__mdCode = ""                      # markdown code block, which is part of the response
         self.__code = ""                        # just the code from the markdown code block   
@@ -88,46 +87,37 @@ class AgentCompiler(agent.AgentAI):
         '''This method gets the response from the model. 
         It sends the prompt to the model and returns the response.'''
         
-        data = {
-            "model": self.model_name,
-            "messages": self.__compile_messages,
-            "stream": False,
-            "temperature": 0.0,
-        }
-        headers = {'Content-Type': 'application/json'}
-        api_key = os.getenv('OPENAI_API_KEY', '')
-        if api_key:
-            headers['Authorization'] = f'Bearer {api_key}'
-
         # we use three retries just in case the server is busy
         # or there is a timeout
         retries = 3     
 
         for attempt in range(retries):
             try:
-                # communicate with the server
-                response = requests.post(self.url,
-                                        headers=headers,
-                                        json=data,
-                                        timeout=300)
+                # Use LiteLLM completion API
+                response = completion(
+                    model=self.model_name,
+                    messages=self.__compile_messages,
+                    temperature=0.0,
+                    api_base=self.server_address if self.server_address else None,
+                    timeout=300
+                )
 
-                if response.status_code == 200:
-                    # get the response from the server
-                    response_dict = json.loads(response.text)
-
-                    # since the response contains a lot of other things, we need to extract the content
-                    response_raw = response_dict['choices'][0]['message']['content']
-
-                    return response_raw
+                # Extract the content from LiteLLM response
+                response_raw = response.choices[0].message.content
+                return response_raw
+                    
+            except Exception as e:
+                error_msg = str(e)
+                if 'timeout' in error_msg.lower():
+                    print(f"Timeout occurred. Retrying {attempt + 1}/{retries}...")
                 else:
-                    # on error, we print the error message
-                    print(f"Error: {response.status_code} - {response.text}")
-                    #return None
-            except requests.exceptions.Timeout:
-                print(f"Timeout occurred. Retrying {attempt + 1}/{retries}...")
+                    print(f"Error: {error_msg}")
+                    
                 if attempt == retries - 1:
                     print("Max retries reached. Exiting.")
                     return None
+        
+        return None
     
 
     def __extract_c_code(self, markdown: str) -> str:

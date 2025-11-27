@@ -30,7 +30,6 @@ class TestAgentAIC(unittest.TestCase):
         """Test agent initialization."""
         self.assertEqual(self.agent.server_address, self.server_address)
         self.assertEqual(self.agent.model_name, self.model_name)
-        self.assertEqual(self.agent.url, f'{self.server_address}')
         self.assertEqual(len(self.agent.messages), 1)
         self.assertEqual(self.agent.messages[0]['role'], 'system')
         self.assertEqual(self.agent.messages[0]['content'], self.my_role)

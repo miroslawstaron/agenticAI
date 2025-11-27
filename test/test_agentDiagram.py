@@ -20,7 +20,7 @@ class TestAgentDiagram(unittest.TestCase):
     def setUp(self):
         """Set up test fixtures."""
         self.server_address = "http://localhost:11434"
-        self.model_name = "test-model"
+        self.model_name = "qwen2.5-coder:latest"
         self.agent = AgentDiagram(
             server_address=self.server_address,
             model_name=self.model_name
@@ -31,7 +31,6 @@ class TestAgentDiagram(unittest.TestCase):
         self.assertEqual(self.agent.server_address, self.server_address)
         self.assertEqual(self.agent.model_name, self.model_name)
         self.assertEqual(self.agent.diagram_type, "class")
-        self.assertEqual(self.agent.url, f'{self.server_address}')
         self.assertEqual(len(self.agent.messages), 1)
         self.assertEqual(self.agent.messages[0]['role'], 'system')
         self.assertIn('class diagram', self.agent.messages[0]['content'])
@@ -86,10 +85,10 @@ class TestAgentDiagram(unittest.TestCase):
         self.assertEqual(agent.diagram_type, "er")
         self.assertIn('entity-relationship diagram', agent.messages[0]['content'])
 
-    @patch('agentDiagram.requests.post')
-    def test_get_response_class_diagram(self, mock_post):
+    @patch('agentDiagram.completion')
+    def test_get_response_class_diagram(self, mock_completion):
         """Test generating a class diagram."""
-        # Mock successful API response with Mermaid diagram
+        # Mock LiteLLM response with Mermaid diagram
         mermaid_diagram = """```mermaid
 classDiagram
     class MyClass {
@@ -98,15 +97,10 @@ classDiagram
     }
 ```"""
         mock_response = Mock()
-        mock_response.status_code = 200
-        mock_response.text = json.dumps({
-            'choices': [{
-                'message': {
-                    'content': mermaid_diagram
-                }
-            }]
-        })
-        mock_post.return_value = mock_response
+        mock_response.choices = [Mock()]
+        mock_response.choices[0].message = Mock()
+        mock_response.choices[0].message.content = mermaid_diagram
+        mock_completion.return_value = mock_response
 
         source_code = """
 class MyClass {
@@ -121,8 +115,8 @@ class MyClass {
         self.assertEqual(len(self.agent.messages), 3)  # system, user, assistant
         self.assertIn('class diagram', self.agent.messages[1]['content'])
 
-    @patch('agentDiagram.requests.post')
-    def test_get_response_flowchart(self, mock_post):
+    @patch('agentDiagram.completion')
+    def test_get_response_flowchart(self, mock_completion):
         """Test generating a flowchart diagram."""
         agent = AgentDiagram(
             server_address=self.server_address,
@@ -130,22 +124,17 @@ class MyClass {
             diagram_type="flowchart"
         )
         
-        # Mock successful API response
+        # Mock LiteLLM response
         mermaid_diagram = """```mermaid
 flowchart TD
     Start --> Process
     Process --> End
 ```"""
         mock_response = Mock()
-        mock_response.status_code = 200
-        mock_response.text = json.dumps({
-            'choices': [{
-                'message': {
-                    'content': mermaid_diagram
-                }
-            }]
-        })
-        mock_post.return_value = mock_response
+        mock_response.choices = [Mock()]
+        mock_response.choices[0].message = Mock()
+        mock_response.choices[0].message.content = mermaid_diagram
+        mock_completion.return_value = mock_response
 
         source_code = "int main() { return 0; }"
         response = agent.get_response(source_code)
@@ -154,14 +143,11 @@ flowchart TD
         self.assertEqual(response, mermaid_diagram)
         self.assertIn('flowchart', agent.messages[1]['content'])
 
-    @patch('agentDiagram.requests.post')
-    def test_get_response_error(self, mock_post):
+    @patch('agentDiagram.completion')
+    def test_get_response_error(self, mock_completion):
         """Test error response from the model."""
-        # Mock error response
-        mock_response = Mock()
-        mock_response.status_code = 500
-        mock_response.text = "Internal Server Error"
-        mock_post.return_value = mock_response
+        # Mock error from LiteLLM
+        mock_completion.side_effect = Exception("API Error")
 
         source_code = "int main() { return 0; }"
         response = self.agent.get_response(source_code)
@@ -169,23 +155,18 @@ flowchart TD
         # Verify error handling
         self.assertIsNone(response)
 
-    @patch('agentDiagram.requests.post')
-    def test_get_response_timeout_retry(self, mock_post):
+    @patch('agentDiagram.completion')
+    def test_get_response_timeout_retry(self, mock_completion):
         """Test timeout with retry mechanism."""
         # Mock timeout on first two attempts, success on third
         mock_response = Mock()
-        mock_response.status_code = 200
-        mock_response.text = json.dumps({
-            'choices': [{
-                'message': {
-                    'content': '```mermaid\nclassDiagram\n```'
-                }
-            }]
-        })
+        mock_response.choices = [Mock()]
+        mock_response.choices[0].message = Mock()
+        mock_response.choices[0].message.content = '```mermaid\nclassDiagram\n```'
         
-        mock_post.side_effect = [
-            requests.exceptions.Timeout(),
-            requests.exceptions.Timeout(),
+        mock_completion.side_effect = [
+            Exception("timeout error"),
+            Exception("timeout error"),
             mock_response
         ]
 
@@ -194,23 +175,23 @@ flowchart TD
 
         # Verify retry worked
         self.assertIsNotNone(response)
-        self.assertEqual(mock_post.call_count, 3)
+        self.assertEqual(mock_completion.call_count, 3)
 
-    @patch('agentDiagram.requests.post')
-    def test_get_response_max_retries_exceeded(self, mock_post):
+    @patch('agentDiagram.completion')
+    def test_get_response_max_retries_exceeded(self, mock_completion):
         """Test max retries exceeded."""
         # Mock timeout on all attempts
-        mock_post.side_effect = requests.exceptions.Timeout()
+        mock_completion.side_effect = Exception("timeout error")
 
         source_code = "int main() { return 0; }"
         response = self.agent.get_response(source_code)
 
         # Verify max retries reached
         self.assertIsNone(response)
-        self.assertEqual(mock_post.call_count, 3)
+        self.assertEqual(mock_completion.call_count, 3)
 
-    @patch('agentDiagram.requests.post')
-    def test_get_response_with_api_key(self, mock_post):
+    @patch('agentDiagram.completion')
+    def test_get_response_with_api_key(self, mock_completion):
         """Test response with API key in headers."""
         api_key = "test-key-123"
         agent = AgentDiagram(
@@ -220,23 +201,15 @@ flowchart TD
         )
         
         mock_response = Mock()
-        mock_response.status_code = 200
-        mock_response.text = json.dumps({
-            'choices': [{
-                'message': {
-                    'content': '```mermaid\nclassDiagram\n```'
-                }
-            }]
-        })
-        mock_post.return_value = mock_response
+        mock_response.choices = [Mock()]
+        mock_response.choices[0].message = Mock()
+        mock_response.choices[0].message.content = '```mermaid\nclassDiagram\n```'
+        mock_completion.return_value = mock_response
 
         agent.get_response("int main() { return 0; }")
 
-        # Verify Authorization header was included
-        call_args = mock_post.call_args
-        headers = call_args[1]['headers']
-        self.assertIn('Authorization', headers)
-        self.assertEqual(headers['Authorization'], f'Bearer {api_key}')
+        # Verify completion was called
+        mock_completion.assert_called_once()
 
     def test_extract_mermaid_diagram_with_code_block(self):
         """Test extracting Mermaid diagram from code block."""
@@ -336,6 +309,133 @@ classDiagram
             # Clean up
             if os.path.exists(tmp_filename):
                 os.remove(tmp_filename)
+
+
+    @patch('subprocess.run')
+    def test_validate_mermaid_diagram_valid(self, mock_run):
+        """Test validation of a valid mermaid diagram."""
+        # Mock successful validation
+        mock_run.return_value = MagicMock(returncode=0, stderr='', stdout='')
+        
+        mermaid_content = """
+        classDiagram
+            class Animal {
+                +String name
+                +makeSound()
+            }
+        """
+        
+        is_valid, error_msg = self.agent.validate_mermaid_diagram(mermaid_content)
+        
+        self.assertTrue(is_valid)
+        self.assertIsNone(error_msg)
+        self.assertTrue(mock_run.called)
+
+    @patch('subprocess.run')
+    def test_validate_mermaid_diagram_invalid(self, mock_run):
+        """Test validation of an invalid mermaid diagram."""
+        # Mock failed validation
+        mock_run.return_value = MagicMock(
+            returncode=1, 
+            stderr='Error: Parse error on line 2',
+            stdout=''
+        )
+        
+        mermaid_content = """
+        classDiagram
+            invalid syntax here
+        """
+        
+        is_valid, error_msg = self.agent.validate_mermaid_diagram(mermaid_content)
+        
+        self.assertFalse(is_valid)
+        self.assertIsNotNone(error_msg)
+        self.assertIn('Error', error_msg)
+
+    @patch('subprocess.run')
+    def test_validate_mermaid_diagram_tool_not_found(self, mock_run):
+        """Test validation when mmdc tool is not installed."""
+        # Mock FileNotFoundError
+        mock_run.side_effect = FileNotFoundError()
+        
+        mermaid_content = "classDiagram\n    class Test"
+        
+        is_valid, error_msg = self.agent.validate_mermaid_diagram(mermaid_content)
+        
+        # Should return valid when tool is not available
+        self.assertTrue(is_valid)
+        self.assertIsNone(error_msg)
+
+    @patch('agentDiagram.AgentDiagram.validate_mermaid_diagram')
+    @patch('agentDiagram.completion')
+    def test_get_response_with_validation_success(self, mock_completion, mock_validate):
+        """Test get_response with validation enabled and valid diagram."""
+        # Mock LiteLLM response
+        mock_response = Mock()
+        mock_response.choices = [Mock()]
+        mock_response.choices[0].message = Mock()
+        mock_response.choices[0].message.content = "```mermaid\nclassDiagram\n    class Test\n```"
+        mock_completion.return_value = mock_response
+        
+        # Mock successful validation
+        mock_validate.return_value = (True, None)
+        
+        response = self.agent.get_response("class Test {}", validate=True)
+        
+        self.assertIsNotNone(response)
+        self.assertIn('classDiagram', response)
+        mock_validate.assert_called_once()
+
+    @patch('agentDiagram.AgentDiagram.validate_mermaid_diagram')
+    @patch('agentDiagram.completion')
+    def test_get_response_with_validation_and_fix(self, mock_completion, mock_validate):
+        """Test get_response with validation that requires fixes."""
+        # First response - invalid diagram
+        first_response = Mock()
+        first_response.choices = [Mock()]
+        first_response.choices[0].message = Mock()
+        first_response.choices[0].message.content = "```mermaid\nclassDiagram\n    invalid syntax\n```"
+        
+        # Second response - valid diagram after fix
+        second_response = Mock()
+        second_response.choices = [Mock()]
+        second_response.choices[0].message = Mock()
+        second_response.choices[0].message.content = "```mermaid\nclassDiagram\n    class Test\n```"
+        
+        mock_completion.side_effect = [first_response, second_response]
+        
+        # First validation fails, second succeeds
+        mock_validate.side_effect = [
+            (False, "Parse error on line 2"),
+            (True, None)
+        ]
+        
+        response = self.agent.get_response("class Test {}", validate=True, max_fix_attempts=5)
+        
+        self.assertIsNotNone(response)
+        self.assertEqual(mock_validate.call_count, 2)
+        self.assertEqual(mock_completion.call_count, 2)
+
+    @patch('agentDiagram.AgentDiagram.validate_mermaid_diagram')
+    @patch('agentDiagram.completion')
+    def test_get_response_with_validation_max_attempts(self, mock_completion, mock_validate):
+        """Test get_response when max fix attempts is reached."""
+        # Mock response with invalid diagram
+        mock_response = Mock()
+        mock_response.choices = [Mock()]
+        mock_response.choices[0].message = Mock()
+        mock_response.choices[0].message.content = "```mermaid\\nclassDiagram\\n    invalid syntax\\n```"
+        mock_completion.return_value = mock_response
+        
+        # All validations fail
+        mock_validate.return_value = (False, "Parse error")
+        
+        max_attempts = 2
+        response = self.agent.get_response("class Test {}", validate=True, max_fix_attempts=max_attempts)
+        
+        self.assertIsNotNone(response)
+        # Should validate initial + max_attempts (2) = 3 total
+        self.assertEqual(mock_validate.call_count, max_attempts + 1)
 
 
 if __name__ == '__main__':

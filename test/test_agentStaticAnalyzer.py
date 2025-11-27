@@ -31,7 +31,6 @@ class TestAgentStaticAnalyzer(unittest.TestCase):
         """Test agent initialization."""
         self.assertEqual(self.agent.server_address, self.server_address)
         self.assertEqual(self.agent.model_name, self.model_name)
-        self.assertEqual(self.agent.url, f'{self.server_address}')
         self.assertEqual(self.agent._AgentStaticAnalyzer__trials, self.trials)
         self.assertEqual(self.agent.logs, [])
 

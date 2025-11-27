@@ -1,7 +1,6 @@
 import agent
 import subprocess
 import re
-import requests
 import json
 
 class AgentH(agent.AgentAI):
@@ -13,7 +12,6 @@ class AgentH(agent.AgentAI):
     def __init__(self, server_address=None, model_name=None, my_role=None):
         self.server_address = server_address        # address of the server
         self.model_name = model_name                # name of the model 
-        self.url = f'{self.server_address}'    # chat API endpoint
         self.__response = ""                    # response from the model
         self.__mdCode = ""                      # markdown code block, which is part of the response
         self.__code = ""                        # just the code from the markdown code block   

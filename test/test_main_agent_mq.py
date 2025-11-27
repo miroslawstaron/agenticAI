@@ -2,6 +2,7 @@
 import unittest
 import os
 import sys
+import sqlite3
 import tempfile
 from unittest.mock import Mock, patch, MagicMock
 
@@ -313,7 +314,7 @@ class TestMainAgentMQIntegration(unittest.TestCase):
         mq.close()
         
         # Verify connection is closed (will raise error if we try to use it)
-        with self.assertRaises(Exception):
+        with self.assertRaises(sqlite3.ProgrammingError):
             mq.publish("Agent1", "Agent2", "should fail")
 
 

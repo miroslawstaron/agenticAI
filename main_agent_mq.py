@@ -165,7 +165,7 @@ def main():
     parser.add_argument(
         "--server",
         type=str,
-        default="http://deepestthought.cse.chalmers.se:11434/v1/chat/completions",
+        default="http://localhost:11434/v1/chat/completions",
         help="Server address for LLM API"
     )
     parser.add_argument(

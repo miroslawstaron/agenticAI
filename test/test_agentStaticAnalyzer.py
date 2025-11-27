@@ -139,10 +139,10 @@ class TestAgentStaticAnalyzer(unittest.TestCase):
 
         self.assertIn('main', result)
 
-    @patch('agentStaticAnalyzer.requests.post')
+    @patch('agentStaticAnalyzer.completion')
     @patch('agentStaticAnalyzer.subprocess.run')
     @patch('agentStaticAnalyzer.AgentCompiler')
-    def test_get_response_with_issues_and_fix(self, mock_compiler_class, mock_run, mock_post):
+    def test_get_response_with_issues_and_fix(self, mock_compiler_class, mock_run, mock_completion):
         """Test get_response with issues that get fixed."""
         # Create temp directory if it doesn't exist
         os.makedirs('./temp', exist_ok=True)
@@ -158,17 +158,12 @@ class TestAgentStaticAnalyzer(unittest.TestCase):
             Mock(stderr=b''),
         ]
 
-        # Mock LLM response with fixed code
+        # Mock LiteLLM response with fixed code
         mock_response = Mock()
-        mock_response.status_code = 200
-        mock_response.text = json.dumps({
-            'choices': [{
-                'message': {
-                    'content': '```c\nint main() { return 0; }\n```'
-                }
-            }]
-        })
-        mock_post.return_value = mock_response
+        mock_response.choices = [Mock()]
+        mock_response.choices[0].message = Mock()
+        mock_response.choices[0].message.content = '```c\nint main() { return 0; }\n```'
+        mock_completion.return_value = mock_response
 
         code = "```c\nint main() { int x; return 0; }\n```"
         result = self.agent.get_response(code)
@@ -176,20 +171,15 @@ class TestAgentStaticAnalyzer(unittest.TestCase):
         # Should have attempted to fix
         self.assertIsNotNone(result)
 
-    @patch('agentStaticAnalyzer.requests.post')
-    def test_solve_problem(self, mock_post):
+    @patch('agentStaticAnalyzer.completion')
+    def test_solve_problem(self, mock_completion):
         """Test the problem solving mechanism."""
-        # Mock LLM response
+        # Mock LiteLLM response
         mock_response = Mock()
-        mock_response.status_code = 200
-        mock_response.text = json.dumps({
-            'choices': [{
-                'message': {
-                    'content': 'Fixed code'
-                }
-            }]
-        })
-        mock_post.return_value = mock_response
+        mock_response.choices = [Mock()]
+        mock_response.choices[0].message = Mock()
+        mock_response.choices[0].message.content = 'Fixed code'
+        mock_completion.return_value = mock_response
 
         # Set up error state
         self.agent._AgentStaticAnalyzer__code = "int main() { }"
@@ -199,11 +189,10 @@ class TestAgentStaticAnalyzer(unittest.TestCase):
 
         self.assertEqual(result, 'Fixed code')
 
-    @patch('agentStaticAnalyzer.requests.post')
-    def test_get_response_analyzer_timeout(self, mock_post):
+    @patch('agentStaticAnalyzer.completion')
+    def test_get_response_analyzer_timeout(self, mock_completion):
         """Test analyzer response with timeout."""
-        import requests
-        mock_post.side_effect = requests.exceptions.Timeout()
+        mock_completion.side_effect = Exception("timeout")
 
         # Set up state
         self.agent._AgentStaticAnalyzer__analyzer_messages = [

@@ -129,9 +129,9 @@ class TestAgentCompiler(unittest.TestCase):
         self.assertIn('main', result)
         self.assertIn('return 0', result)
 
-    @patch('agentCompiler.requests.post')
+    @patch('agentCompiler.completion')
     @patch('agentCompiler.subprocess.run')
-    def test_get_response_with_compilation_error_and_fix(self, mock_run, mock_post):
+    def test_get_response_with_compilation_error_and_fix(self, mock_run, mock_completion):
         """Test get_response with code that fails then gets fixed."""
         # Create temp directory if it doesn't exist
         os.makedirs('./temp', exist_ok=True)
@@ -142,17 +142,12 @@ class TestAgentCompiler(unittest.TestCase):
             Mock(stderr=b''),  # After fix: successful
         ]
 
-        # Mock LLM response with fixed code
+        # Mock LiteLLM response with fixed code
         mock_response = Mock()
-        mock_response.status_code = 200
-        mock_response.text = json.dumps({
-            'choices': [{
-                'message': {
-                    'content': '```c\nint main() { return 0; }\n```'
-                }
-            }]
-        })
-        mock_post.return_value = mock_response
+        mock_response.choices = [Mock()]
+        mock_response.choices[0].message = Mock()
+        mock_response.choices[0].message.content = '```c\nint main() { return 0; }\n```'
+        mock_completion.return_value = mock_response
 
         # Code with error
         code = "```c\nint main() { return 0 }\n```"
@@ -160,11 +155,11 @@ class TestAgentCompiler(unittest.TestCase):
 
         # Should have attempted to fix
         self.assertIsNotNone(result)
-        mock_post.assert_called()
+        mock_completion.assert_called()
 
-    @patch('agentCompiler.requests.post')
+    @patch('agentCompiler.completion')
     @patch('agentCompiler.subprocess.run')
-    def test_get_response_exceeds_trials(self, mock_run, mock_post):
+    def test_get_response_exceeds_trials(self, mock_run, mock_completion):
         """Test get_response when max trials are exceeded."""
         # Create temp directory if it doesn't exist
         os.makedirs('./temp', exist_ok=True)
@@ -172,17 +167,12 @@ class TestAgentCompiler(unittest.TestCase):
         # All compilation attempts fail
         mock_run.return_value = Mock(stderr=b'error: syntax error')
 
-        # Mock LLM responses
+        # Mock LiteLLM responses
         mock_response = Mock()
-        mock_response.status_code = 200
-        mock_response.text = json.dumps({
-            'choices': [{
-                'message': {
-                    'content': '```c\nint main() { return 0 }\n```'
-                }
-            }]
-        })
-        mock_post.return_value = mock_response
+        mock_response.choices = [Mock()]
+        mock_response.choices[0].message = Mock()
+        mock_response.choices[0].message.content = '```c\nint main() { return 0 }\n```'
+        mock_completion.return_value = mock_response
 
         code = "```c\nint main() { return 0 }\n```"
         result = self.agent.get_response(code)
@@ -190,22 +180,17 @@ class TestAgentCompiler(unittest.TestCase):
         # Should return the last attempted code
         self.assertIsNotNone(result)
         # Should have made exactly 'trials' number of fix attempts
-        self.assertEqual(mock_post.call_count, self.trials)
+        self.assertEqual(mock_completion.call_count, self.trials)
 
-    @patch('agentCompiler.requests.post')
-    def test_solve_problem(self, mock_post):
+    @patch('agentCompiler.completion')
+    def test_solve_problem(self, mock_completion):
         """Test the problem solving mechanism."""
-        # Mock LLM response
+        # Mock LiteLLM response
         mock_response = Mock()
-        mock_response.status_code = 200
-        mock_response.text = json.dumps({
-            'choices': [{
-                'message': {
-                    'content': 'Fixed code'
-                }
-            }]
-        })
-        mock_post.return_value = mock_response
+        mock_response.choices = [Mock()]
+        mock_response.choices[0].message = Mock()
+        mock_response.choices[0].message.content = 'Fixed code'
+        mock_completion.return_value = mock_response
 
         # Set up error state
         self.agent._AgentCompiler__code = "int main() { }"
@@ -214,13 +199,12 @@ class TestAgentCompiler(unittest.TestCase):
         result = self.agent._AgentCompiler__solve_problem()
 
         self.assertEqual(result, 'Fixed code')
-        mock_post.assert_called_once()
+        mock_completion.assert_called_once()
 
-    @patch('agentCompiler.requests.post')
-    def test_get_response_compilation_with_timeout(self, mock_post):
+    @patch('agentCompiler.completion')
+    def test_get_response_compilation_with_timeout(self, mock_completion):
         """Test compilation response with timeout."""
-        import requests
-        mock_post.side_effect = requests.exceptions.Timeout()
+        mock_completion.side_effect = Exception("timeout")
 
         # Set up state
         self.agent._AgentCompiler__compile_messages = [
@@ -230,7 +214,7 @@ class TestAgentCompiler(unittest.TestCase):
         result = self.agent._AgentCompiler__get_response_compilation("Test prompt")
 
         self.assertIsNone(result)
-        self.assertEqual(mock_post.call_count, 3)
+        self.assertEqual(mock_completion.call_count, 3)
 
     def test_get_response_plain_code(self):
         """Test get_response with plain code (no markdown)."""

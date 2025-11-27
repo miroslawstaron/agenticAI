@@ -5,3 +5,4 @@ tqdm
 PyPDF2
 openpyxl
 pymermaid
+re

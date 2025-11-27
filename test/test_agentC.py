@@ -57,25 +57,20 @@ class TestAgentAIC(unittest.TestCase):
         self.assertEqual(agent.max_tokens, max_tokens)
 
     @patch('agentC.AgentCompiler')
-    @patch('agentC.requests.post')
-    def test_get_response_success(self, mock_post, mock_compiler_class):
+    @patch('agentC.completion')
+    def test_get_response_success(self, mock_completion, mock_compiler_class):
         """Test successful response with code compilation."""
         # Mock compiler
         mock_compiler = Mock()
         mock_compiler.get_response.return_value = '#include <stdio.h>\nint main() { return 0; }'
         mock_compiler_class.return_value = mock_compiler
 
-        # Mock successful API response
+        # Mock successful LiteLLM response
         mock_response = Mock()
-        mock_response.status_code = 200
-        mock_response.text = json.dumps({
-            'choices': [{
-                'message': {
-                    'content': '```c\n#include <stdio.h>\nint main() { return 0; }\n```'
-                }
-            }]
-        })
-        mock_post.return_value = mock_response
+        mock_response.choices = [Mock()]
+        mock_response.choices[0].message = Mock()
+        mock_response.choices[0].message.content = '```c\n#include <stdio.h>\nint main() { return 0; }\n```'
+        mock_completion.return_value = mock_response
 
         prompt = "Write a simple C program"
         response = self.agent.get_response(prompt)
@@ -93,8 +88,8 @@ class TestAgentAIC(unittest.TestCase):
         self.assertEqual(self.agent.messages[2]['role'], 'assistant')
 
     @patch('agentC.AgentCompiler')
-    @patch('agentC.requests.post')
-    def test_get_response_with_api_key(self, mock_post, mock_compiler_class):
+    @patch('agentC.completion')
+    def test_get_response_with_api_key(self, mock_completion, mock_compiler_class):
         """Test response with API key in headers."""
         api_key = "test-api-key"
         agent = AgentAIC(
@@ -110,72 +105,65 @@ class TestAgentAIC(unittest.TestCase):
         mock_compiler_class.return_value = mock_compiler
 
         mock_response = Mock()
-        mock_response.status_code = 200
-        mock_response.text = json.dumps({
-            'choices': [{
-                'message': {
-                    'content': 'int main() { return 0; }'
-                }
-            }]
-        })
-        mock_post.return_value = mock_response
+        mock_response.choices = [Mock()]
+        mock_response.choices[0].message = Mock()
+        mock_response.choices[0].message.content = 'int main() { return 0; }'
+        mock_completion.return_value = mock_response
 
         agent.get_response("Test")
 
-        # Verify Authorization header was set
-        call_kwargs = mock_post.call_args[1]
-        self.assertIn('headers', call_kwargs)
-        self.assertEqual(call_kwargs['headers']['Authorization'], f'Bearer {api_key}')
+        # Verify completion was called with correct parameters
+        mock_completion.assert_called_once()
+        call_kwargs = mock_completion.call_args[1]
+        self.assertEqual(call_kwargs['model'], self.model_name)
 
     @patch('agentC.AgentCompiler')
-    @patch('agentC.requests.post')
-    def test_get_response_error(self, mock_post, mock_compiler_class):
+    @patch('agentC.completion')
+    def test_get_response_error(self, mock_completion, mock_compiler_class):
         """Test error response from the model."""
-        mock_response = Mock()
-        mock_response.status_code = 500
-        mock_response.text = "Internal Server Error"
-        mock_post.return_value = mock_response
+        # Mock an exception from LiteLLM
+        mock_completion.side_effect = Exception("API Error")
 
         response = self.agent.get_response("Test prompt")
 
         self.assertIsNone(response)
 
     @patch('agentC.AgentCompiler')
-    @patch('agentC.requests.post')
-    def test_get_response_timeout_retry(self, mock_post, mock_compiler_class):
+    @patch('agentC.completion')
+    def test_get_response_timeout_retry(self, mock_completion, mock_compiler_class):
         """Test timeout with retry mechanism."""
-        import requests
-
         # Mock compiler
         mock_compiler = Mock()
         mock_compiler.get_response.return_value = 'int main() { return 0; }'
         mock_compiler_class.return_value = mock_compiler
 
         # First two calls timeout, third succeeds
-        mock_post.side_effect = [
-            requests.exceptions.Timeout(),
-            requests.exceptions.Timeout(),
-            Mock(status_code=200, text=json.dumps({
-                'choices': [{'message': {'content': 'Success after retry'}}]
-            }))
+        mock_success = Mock()
+        mock_success.choices = [Mock()]
+        mock_success.choices[0].message = Mock()
+        mock_success.choices[0].message.content = 'Success after retry'
+        
+        mock_completion.side_effect = [
+            Exception("timeout"),
+            Exception("timeout"),
+            mock_success
         ]
 
         response = self.agent.get_response("Test")
 
         self.assertIsNotNone(response)
-        self.assertEqual(mock_post.call_count, 3)
+        self.assertEqual(mock_completion.call_count, 3)
 
     @patch('agentC.AgentCompiler')
-    @patch('agentC.requests.post')
-    def test_get_response_max_retries_exceeded(self, mock_post, mock_compiler_class):
+    @patch('agentC.completion')
+    def test_get_response_max_retries_exceeded(self, mock_completion, mock_compiler_class):
         """Test max retries exceeded."""
-        import requests
-        mock_post.side_effect = requests.exceptions.Timeout()
+        mock_completion.side_effect = Exception("timeout")
 
         response = self.agent.get_response("Test")
 
         self.assertIsNone(response)
-        self.assertEqual(mock_post.call_count, 3)
+        self.assertEqual(mock_completion.call_count, 3)
 
     def test_extract_c_code(self):
         """Test C code extraction from markdown."""

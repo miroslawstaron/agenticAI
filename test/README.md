@@ -55,7 +55,7 @@ The test suite includes tests for:
 Install required dependencies:
 
 ```bash
-pip install pandas requests tqdm openpyxl PyPDF2
+pip install pandas litellm tqdm openpyxl PyPDF2
 ```
 
 Note: The `vllm` library is optional. Tests for `vllmAgentAI` will be skipped if it's not installed.
@@ -100,6 +100,11 @@ Tests extensively use mocking to:
 - Mock file I/O operations
 - Mock subprocess calls (gcc, cppcheck)
 - Test retry logic without waiting
+
+After the migration to LiteLLM:
+- Tests mock `litellm.completion` instead of `requests.post`
+- Mock responses use LiteLLM's response object structure (`response.choices[0].message.content`)
+- Simplified error handling with generic Exception objects
 
 ## Notes
 

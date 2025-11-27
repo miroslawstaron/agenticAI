@@ -1,8 +1,8 @@
 # Python dependencies for the agenticAI project
-pandas
-litellm
-tqdm
-PyPDF2
-openpyxl
-pymermaid
-re
+
+# Core dependencies
+pandas          # Data manipulation and Excel file handling
+litellm         # Unified LLM API interface (replaces requests)
+tqdm            # Progress bars for long-running experiments
+openpyxl        # Excel file operations (required by pandas)
+PyPDF2          # PDF parsing for 3GPP document analysis

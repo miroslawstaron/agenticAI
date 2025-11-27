@@ -45,13 +45,13 @@ Use Python's built-in unittest framework:
 
 ```bash
 # Run all tests
-python -m unittest discover -s test -p "test_*.py" -v
+python3 -m unittest discover -s test -p "test_*.py" -v
 
 # Run specific test file
-python -m unittest test.test_agent -v
+python3 -m unittest test.test_agent -v
 
 # Run specific test case
-python -m unittest test.test_agent.TestAgentAI.test_initialization -v
+python3 -m unittest test.test_agent.TestAgentAI.test_initialization -v
 ```
 
 ### Test Structure
@@ -84,7 +84,7 @@ python -m unittest test.test_agent.TestAgentAI.test_initialization -v
 ### Key Configuration Points
 ```python
 # Server endpoints - commonly localhost:11434 or chalmers.se servers
-server_address="http://deepthought.cse.chalmers.se"
+server_address="http://localhost:11434"
 model_name="deepseek-r1:70b"  # Model format: name:size
 my_role="You are a C designer..."  # System prompt defining agent behavior
 ```
@@ -93,8 +93,8 @@ my_role="You are a C designer..."  # System prompt defining agent behavior
 
 ### Running Experiments
 ```bash
-python main.py --prompt "Write a C program to sort an array"
-python main_agentc.py --prompt "Create a linked list implementation"
+python3 main.py --prompt "Write a C program to sort an array"
+python3 main_agentc.py --prompt "Create a linked list implementation"
 ```
 
 ### Data Analysis Pipeline
@@ -183,19 +183,19 @@ match = re.search(pattern, markdown, re.DOTALL)
 ### Running Experiments
 ```bash
 # Basic designer-programmer conversation
-python main.py --prompt "Your task description"
+python3 main.py --prompt "Your task description"
 
 # With compilation validation
-python main_agentc.py --prompt "Generate C code for sorting"
+python3 main_agentc.py --prompt "Generate C code for sorting"
 
 # Human-in-the-loop mode
-python main_human.py --prompt "Code review task"
+python3 main_human.py --prompt "Code review task"
 ```
 
 ### Data Analysis
 ```bash
 # Convert conversation to HTML
-python convert_to_html.py input.xlsx output.html
+python3 convert_to_html.py input.xlsx output.html
 
 # Analyze conversations (Jupyter notebook)
 jupyter notebook analyze.ipynb
@@ -207,10 +207,10 @@ jupyter notebook analyze.ipynb
 pip install -r requirements.txt
 
 # Run tests
-python -m unittest discover -s test -p "test_*.py" -v
+python3 -m unittest discover -s test -p "test_*.py" -v
 
 # Check for import errors
-python -c "import agent; import agentC; import agentCompiler"
+python3 -c "import agent; import agentC; import agentCompiler"
 ```
 
 ## Troubleshooting

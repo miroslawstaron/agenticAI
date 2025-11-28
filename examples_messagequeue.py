@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """
 Example usage of the MessageQueue for inter-agent communication.
 

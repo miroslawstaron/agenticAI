@@ -22,12 +22,12 @@ def main():
     args = parser.parse_args()
 
     # Create an instance of the Agent class
-    agentProgrammer = AgentAIC(server_address="http://deepestthought.cse.chalmers.se:11434/v1/chat/completions", 
+    agentProgrammer = AgentAIC(server_address="http://deepestthought.cse.chalmers.se:11434", 
                               model_name="deepseek-r1:70b",
                               api_key=API_KEY,
                               my_role="You are a C programmer. You respond with the code in C to solve the task. No comments or explanations")
     
-    agentDesigner = AgentAI(server_address="http://deepestthought.cse.chalmers.se:11434/v1/chat/completions", 
+    agentDesigner = AgentAI(server_address="http://deepestthought.cse.chalmers.se:11434", 
                             model_name="deepseek-r1:70b",
                             api_key=API_KEY,
                             my_role="You are a C designer. You will be given a task and you will respond with design suggestions to solve or the task.")

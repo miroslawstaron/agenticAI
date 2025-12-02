@@ -33,14 +33,14 @@ def create_agents(server_address, api_key):
     """
     designer = AgentAI(
         server_address=server_address,
-        model_name="deepseek-r1:70b",
+        model_name="ollama/llama3.2:1b",
         api_key=api_key,
         my_role="You are a C designer. You will be given a task and you will respond with design suggestions to solve the task."
     )
     
     programmer = AgentAI(
         server_address=server_address,
-        model_name="deepseek-r1:70b",
+        model_name="ollama/llama3.2:1b",
         api_key=api_key,
         my_role="You are a C programmer. You respond with the code in C to solve the task. No comments or explanations."
     )
@@ -62,8 +62,9 @@ def run_conversation(designer, programmer, message_queue, initial_prompt, max_it
         output_file: Optional output file for saving progress
         
     Returns:
-        Programmer agent (contains conversation history)
+        List of all messages from the conversation
     """
+    all_messages = []
     # Step 1: Send initial prompt to programmer via message queue
     message_queue.publish(
         sender="User",
@@ -141,7 +142,11 @@ def run_conversation(designer, programmer, message_queue, initial_prompt, max_it
         if output_file:
             programmer.save_to_excel(output_file)
     
-    return programmer
+    # Collect all messages from agents
+    all_messages.extend(designer.messages)
+    all_messages.extend(programmer.messages)
+    
+    return all_messages
 
 
 def main():
@@ -165,7 +170,7 @@ def main():
     parser.add_argument(
         "--server",
         type=str,
-        default="http://localhost:11434/v1/chat/completions",
+        default="http://localhost:11434",
         help="Server address for LLM API"
     )
     parser.add_argument(
@@ -188,7 +193,7 @@ def main():
         designer, programmer = create_agents(args.server, API_KEY)
         
         # Run conversation
-        programmer = run_conversation(
+        all_messages = run_conversation(
             designer,
             programmer,
             message_queue,
@@ -199,6 +204,15 @@ def main():
         
         # Save final results
         programmer.save_to_excel(output_file)
+        
+        # Save all messages from conversation
+        if all_messages:
+            import pandas as pd
+            df = pd.DataFrame(all_messages)
+            messages_file = output_file.replace('.xlsx', '_all_messages.xlsx')
+            df.to_excel(messages_file, index=False)
+            print(f"All messages saved to {messages_file}")
+        
         print(f"\nConversation saved to {output_file}")
         
     finally:

@@ -1,7 +1,7 @@
 """
 SQLite-based message queue for inter-agent communication.
 
-This module provides a simple in-memory message queue that allows agents to
+This module provides a singleton in-memory message queue that allows agents to
 communicate asynchronously through messages. Messages can be sent to specific
 recipients, broadcast to all agents, or sent to anyone who retrieves them first.
 """
@@ -11,6 +11,27 @@ import threading
 import json
 from typing import Optional, Dict, Any, List, Callable
 from datetime import datetime, timezone
+
+
+class SingletonMeta(type):
+    """Metaclass for implementing singleton pattern."""
+    
+    _instances: Dict[type, object] = {}
+    _lock = threading.Lock()
+    
+    def __call__(cls, *args, **kwargs):
+        """
+        Implement singleton pattern with thread safety.
+        
+        Returns:
+            The singleton instance of the class
+        """
+        if cls not in cls._instances:
+            with cls._lock:
+                if cls not in cls._instances:
+                    instance = super(SingletonMeta, cls).__call__(*args, **kwargs)
+                    cls._instances[cls] = instance
+        return cls._instances[cls]
 
 
 class Message:
@@ -44,22 +65,30 @@ class Message:
         return f"Message(id={self.message_id}, sender='{self.sender}', recipient='{self.recipient}')"
 
 
-class MessageQueue:
+class MessageQueue(metaclass=SingletonMeta):
     """
-    In-memory SQLite message queue for agent communication.
+    Singleton in-memory SQLite message queue for agent communication.
     
     This class provides a thread-safe message queue that supports:
     - Publishing messages to specific recipients, broadcast, or anyone
     - Retrieving messages for a specific recipient
     - Listening/hooking to messages for automatic callback execution
+    
+    As a singleton, all calls to MessageQueue() return the same instance.
     """
     
+    _initialized = False
+    
     def __init__(self):
-        """Initialize the in-memory SQLite message queue."""
+        """Initialize the in-memory SQLite message queue (only once)."""
+        if MessageQueue._initialized:
+            return
+        
         self.connection = sqlite3.connect(':memory:', check_same_thread=False)
         self.lock = threading.Lock()
         self.listeners: Dict[str, List[Callable[[Message], None]]] = {}
         self._initialize_database()
+        MessageQueue._initialized = True
     
     def _initialize_database(self):
         """Create the messages table in the SQLite database."""
@@ -323,3 +352,25 @@ class MessageQueue:
             self.connection.close()
         except:
             pass
+
+
+def get_message_queue() -> MessageQueue:
+    """
+    Get the singleton instance of MessageQueue.
+    
+    Returns:
+        The singleton MessageQueue instance
+    """
+    return MessageQueue()
+
+
+def reset_message_queue():
+    """
+    Reset the singleton instance of MessageQueue.
+    
+    This is useful for testing. After calling this, the next call to
+    get_message_queue() or MessageQueue() will create a new instance.
+    """
+    MessageQueue._initialized = False
+    if MessageQueue in SingletonMeta._instances:
+        del SingletonMeta._instances[MessageQueue]

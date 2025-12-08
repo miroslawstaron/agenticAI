@@ -143,8 +143,10 @@ def run_conversation(designer, programmer, message_queue, initial_prompt, max_it
             programmer.save_to_excel(output_file)
     
     # Collect all messages from agents
-    all_messages.extend(designer.messages)
-    all_messages.extend(programmer.messages)
+    if hasattr(designer, 'messages') and isinstance(designer.messages, list):
+        all_messages.extend(designer.messages)
+    if hasattr(programmer, 'messages') and isinstance(programmer.messages, list):
+        all_messages.extend(programmer.messages)
     
     return all_messages
 

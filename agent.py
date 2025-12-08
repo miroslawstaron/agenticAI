@@ -3,6 +3,8 @@ from litellm import completion
 import pandas as pd
 import re
 import os
+import uuid
+from logger import get_logger
 
 class AgentAI:
     
@@ -22,6 +24,12 @@ class AgentAI:
         # Prefer explicit api_key; else fall back to env var OPENAI_API_KEY
         self.api_key = api_key
         
+        # Generate unique agent ID
+        self.agent_id = str(uuid.uuid4())
+        
+        # Get logger instance
+        self.logger = get_logger()
+        
         # Set API key in environment for LiteLLM if provided
         if self.api_key:
             os.environ['OPENAI_API_KEY'] = self.api_key
@@ -34,10 +42,16 @@ class AgentAI:
             {"role": "system",
              "content": my_role 
             }
-        ] 
+        ]
+        
+        # Log agent initialization with system prompt
+        self.logger.log_agent_init(self.agent_id, self.__class__.__name__, my_role) 
 
     def get_response(self, prompt):
         # send a request to the LLM via LiteLLM
+        
+        # Log the action
+        self.logger.log_agent_action(self.agent_id, "Sending prompt to LLM", f"Model: {self.model_name}")
         
         # add the user prompt to the messages list
         self.messages.append({"role": "user", "content": prompt})
@@ -60,10 +74,18 @@ class AgentAI:
 
                 # add the response to the messages list
                 self.messages.append({"role": "assistant", "content": response_raw})
+                
+                # Log successful response
+                self.logger.log_agent_action(self.agent_id, "Received response from LLM")
+                
                 return response_raw
                 
             except Exception as e:
                 error_msg = str(e)
+                
+                # Log the exception
+                self.logger.log_exception(self.agent_id, e, "get_response")
+                
                 if 'timeout' in error_msg.lower():
                     print(f"Timeout occurred. Retrying {attempt + 1}/{retries}...")
                 else:
@@ -71,16 +93,19 @@ class AgentAI:
                 
                 if attempt == retries - 1:
                     print("Max retries reached. Exiting.")
+                    self.logger.log_agent_action(self.agent_id, "Max retries reached", "Returning None")
                     return None
                     
         return None
         
 
     def start(self):
+        self.logger.log_agent_action(self.agent_id, "Agent started", f"Model: {self.model_name}, Server: {self.server_address}")
         print(f"Starting agent with model {self.model_name} at {self.server_address}")
 
     # this function saves the messages to a file
     def save_to_csv(self,filename):
+        self.logger.log_agent_action(self.agent_id, "Saving messages to CSV", f"File: {filename}")
         # open the file in write mode
         with open(filename, 'w') as f:
             # write the header with $ as separator
@@ -91,6 +116,7 @@ class AgentAI:
 
     # this function saves the messages to an Excel file
     def save_to_excel(self, filename):
+        self.logger.log_agent_action(self.agent_id, "Saving messages to Excel", f"File: {filename}")
         
         # convert the messages list to a DataFrame and rename columns if necessary
         df = pd.DataFrame(self.messages)

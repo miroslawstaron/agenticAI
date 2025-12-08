@@ -4,6 +4,8 @@ import re
 from litellm import completion
 import json
 import os
+import uuid
+from logger import get_logger
 
 class AgentCompiler(agent.AgentAI):
     '''This class uses the LLM model together with a gcc compiler to compile
@@ -18,6 +20,12 @@ class AgentCompiler(agent.AgentAI):
         self.__compile_result = ""              # result of the compilation using gcc 
         self.__trials = trials                   # number of trials to fix the compilation errors
 
+        # Generate unique agent ID
+        self.agent_id = str(uuid.uuid4())
+        
+        # Get logger instance
+        self.logger = get_logger()
+
         # initial compile messages queue
         self.__initial_compile_messages = [
             {"role": "system",
@@ -28,11 +36,17 @@ class AgentCompiler(agent.AgentAI):
         # the conversation between the model and the user
         # that is aimed to solve compilation errors
         self.__compile_messages = self.__initial_compile_messages
+        
+        # Log agent initialization
+        self.logger.log_agent_init(self.agent_id, self.__class__.__name__, 
+                                   "You are a C Programmer. You solve problems with C programs, no comments or explanations.")
 
     def get_response(self, code: str) -> str:
         '''This method compiles the code using gcc and tries to fix the compilation errors. 
         It returns the result of the compilation.'''
 
+        self.logger.log_agent_action(self.agent_id, "Starting code compilation process")
+        
         # check if the code is in the markdown code block
         # if it is, we extract the code from the markdown code block
         # if it is not, we just use the code as it is
@@ -49,12 +63,16 @@ class AgentCompiler(agent.AgentAI):
 
         # if the compilation was successful, we return the result
         if self.__compile_result == "Compilation successful":
+            self.logger.log_agent_action(self.agent_id, "Compilation successful on first attempt")
             return self.__code
         else:
             # if the compilation was not successful, we try to fix it
+            self.logger.log_agent_action(self.agent_id, "Compilation failed, attempting to fix", 
+                                        f"Error: {self.__compile_result[:100]}")
             attempts = 0
             while attempts < self.__trials and self.__compile_result != "Compilation successful":
                 print(f'Attempt {attempts + 1} to fix the compilation error...')
+                self.logger.log_agent_action(self.agent_id, f"Fixing attempt {attempts + 1}/{self.__trials}")
                 
                 code = self.__solve_problem()
                 if code.__contains__("```c"):
@@ -66,6 +84,14 @@ class AgentCompiler(agent.AgentAI):
                 self.__compile_result = self.__compile_code(self.__code)
 
                 attempts += 1
+            
+            if self.__compile_result == "Compilation successful":
+                self.logger.log_agent_action(self.agent_id, "Compilation successful after fixing", 
+                                           f"Fixed in {attempts} attempt(s)")
+            else:
+                self.logger.log_agent_action(self.agent_id, "Compilation failed after all attempts", 
+                                           f"Final error: {self.__compile_result[:100]}")
+            
             return self.__code
 
     def __solve_problem(self) -> str:
@@ -108,6 +134,10 @@ class AgentCompiler(agent.AgentAI):
                     
             except Exception as e:
                 error_msg = str(e)
+                
+                # Log the exception
+                self.logger.log_exception(self.agent_id, e, "__get_response_compilation")
+                
                 if 'timeout' in error_msg.lower():
                     print(f"Timeout occurred. Retrying {attempt + 1}/{retries}...")
                 else:
@@ -115,6 +145,7 @@ class AgentCompiler(agent.AgentAI):
                     
                 if attempt == retries - 1:
                     print("Max retries reached. Exiting.")
+                    self.logger.log_agent_action(self.agent_id, "Max retries reached in compilation", "Returning None")
                     return None
         
         return None

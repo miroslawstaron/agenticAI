@@ -2,6 +2,8 @@ import agent
 import subprocess
 import re
 import json
+import uuid
+from logger import get_logger
 
 class AgentH(agent.AgentAI):
     '''This class extends the AgentAI class, but mainly for an interface. 
@@ -17,6 +19,12 @@ class AgentH(agent.AgentAI):
         self.__code = ""                        # just the code from the markdown code block   
         self.__compile_result = ""              # result of the compilation using gcc
         
+        # Generate unique agent ID
+        self.agent_id = str(uuid.uuid4())
+        
+        # Get logger instance
+        self.logger = get_logger()
+        
         # the main conversation between the agent and the human. 
         # we do not use it at the moment, but it could be useful in the future
         # TODO: implement the conversation log
@@ -24,7 +32,10 @@ class AgentH(agent.AgentAI):
             {"role": "system",
              "content": my_role 
             }
-        ] 
+        ]
+        
+        # Log agent initialization
+        self.logger.log_agent_init(self.agent_id, self.__class__.__name__, my_role if my_role else "Human agent") 
 
     def get_response(self, prompt):
         '''This method gets the response from the human being.
@@ -32,6 +43,8 @@ class AgentH(agent.AgentAI):
         Then it prints the prompt for the human to see.
         Then it waits for the human to write the response.
         It saves the response and returns it.'''
+        
+        self.logger.log_agent_action(self.agent_id, "Waiting for human response")
         
         # add the user prompt to the messages list
         self.messages.append({"role": "user", "content": prompt})
@@ -50,6 +63,8 @@ class AgentH(agent.AgentAI):
         
         # save the response to the conversation log
         self.messages.append({"role": "assistant", "content": self.__response})
+
+        self.logger.log_agent_action(self.agent_id, "Received human response")
 
         return self.__response
     

@@ -48,7 +48,7 @@ def create_agents(server_address, api_key, model_name="ollama/llama3.2:1b"):
         Tuple of (designer_agent, programmer_agent)
     """
     # Log that agent creation process is starting with the specified model
-    logger.log(f"Creating agents with model: {model_name}")
+    logger.log(f"[Coordinator] Creating agents with model: {model_name}")
     
     # Instantiate Designer agent with C design role for solving problems through design suggestions
     designer = AgentAI(
@@ -67,7 +67,7 @@ def create_agents(server_address, api_key, model_name="ollama/llama3.2:1b"):
     )
     
     # Log successful agent creation to track initialization progress
-    logger.log("Agents created successfully")
+    logger.log("[Coordinator] Agents created successfully")
     # Return both agents as a tuple for use in the main conversation loop
     return designer, programmer
 
@@ -92,11 +92,11 @@ def run_conversation(designer, programmer, message_queue, initial_prompt, max_it
     # Initialize list to collect all messages from both agents for later analysis
     all_messages = []
     # Log conversation start for debugging and tracking execution flow
-    logger.log("Starting conversation...")
+    logger.log("[Coordinator] Starting conversation...")
     
     # Step 1: Send initial prompt to programmer via message queue
     # Log the initial prompt being published (sanitize newlines for readability)
-    logger.log(f"Publishing initial prompt: {initial_prompt.replace('\n', '$$$$')[:50]}...")
+    logger.log(f"[Coordinator] Publishing initial prompt: {initial_prompt.replace('\n', '$$$$')[:50]}...")
     # Publish initial task to the Programmer agent through the message queue
     message_queue.publish(
         sender="User",  # Sender is the user initiating the conversation
@@ -105,18 +105,18 @@ def run_conversation(designer, programmer, message_queue, initial_prompt, max_it
     )
     
     # Programmer retrieves and responds to initial task
-    # Get all messages queued for the Programmer from the message queue
-    messages = message_queue.get_messages(PROGRAMMER_ID)
-    # Check if any messages were retrieved (defensive programming)
-    if messages:
-        # Extract task content from the last (most recent) message in the queue
-        task_content = messages[-1].payload.get("content", "")
+    # Get the latest message for the Programmer using the new get_latest_message() method
+    message = message_queue.get_latest_message(PROGRAMMER_ID)
+    # Check if a message was retrieved (defensive programming)
+    if message:
+        # Extract task content from the message payload
+        task_content = message.payload.get("content", "")
         # Log that programmer is processing the initial task
-        logger.log("Programmer processing initial task")
+        logger.log("[Coordinator] Programmer processing initial task")
         # Request programmer agent to generate response/code for the task
         programmer_response = programmer.get_response(task_content)
         # Log the response length for debugging and tracking output size
-        logger.log(f"Programmer generated response (length: {programmer_response.replace('\n', '$$$$')[:100]})")
+        logger.log(f"[Coordinator] Programmer generated response (length: {programmer_response.replace('\n', '$$$$')[:100]})")
         
         # Programmer sends solution to Designer for review
         # Publish the programmer's solution to the Designer agent
@@ -131,22 +131,22 @@ def run_conversation(designer, programmer, message_queue, initial_prompt, max_it
         )
     
     # Designer retrieves and reviews the solution
-    # Get all messages queued for the Designer from the message queue
-    messages = message_queue.get_messages(DESIGNER_ID)
-    # Check if any messages were retrieved (defensive programming)
-    if messages:
-        # Extract solution content from the last (most recent) message in the queue
-        solution = messages[-1].payload.get("content", "")
+    # Get the latest message for the Designer using the new get_latest_message() method
+    message = message_queue.get_latest_message(DESIGNER_ID)
+    # Check if a message was retrieved (defensive programming)
+    if message:
+        # Extract solution content from the message payload
+        solution = message.payload.get("content", "")
         # Extract original task from message metadata for review context
-        task = messages[-1].payload.get("original_task", "")
+        task = message.payload.get("original_task", "")
         # Log that designer is reviewing the initial solution
-        logger.log("Designer reviewing initial solution")
+        logger.log("[Coordinator] Designer reviewing initial solution")
         # Request designer agent to provide feedback and improvement suggestions
         designer_response = designer.get_response(
             f'Here is my solution to this problem "{task}", how can I improve it: {solution}?'
         )
         # Log the feedback length for debugging and tracking output size
-        logger.log(f"Designer generated feedback (length: {designer_response.replace('\n', '$$$$')[:100]})")
+        logger.log(f"[Coordinator] Designer generated feedback (length: {designer_response.replace('\n', '$$$$')[:100]})")
         
         # Designer sends feedback to Programmer
         # Publish the designer's feedback back to the Programmer for improvements
@@ -160,18 +160,18 @@ def run_conversation(designer, programmer, message_queue, initial_prompt, max_it
     # Create progress bar for visual feedback on iteration count
     for i in tqdm(range(max_iterations), desc="Processing iterations"):
         # Programmer retrieves designer feedback
-        # Get all messages queued for the Programmer from the message queue
-        messages = message_queue.get_messages(PROGRAMMER_ID)
-        # Check if any messages were retrieved (defensive programming)
-        if messages:
-            # Extract feedback content from the last (most recent) message in the queue
-            feedback = messages[-1].payload.get("content", "")
+        # Get the latest message for the Programmer using the new get_latest_message() method
+        message = message_queue.get_latest_message(PROGRAMMER_ID)
+        # Check if a message was retrieved (defensive programming)
+        if message:
+            # Extract feedback content from the message payload
+            feedback = message.payload.get("content", "")
             # Log the feedback being processed in current iteration
-            logger.log(f"Programmer processing feedback (iteration {i+1}) - Feedback - {feedback.replace('\n', '$$$$')[:100]}")
+            logger.log(f"[Coordinator] Programmer processing feedback (iteration {i+1}) - Feedback - {feedback.replace('\n', '$$$$')[:100]}")
             # Request programmer to generate improved code based on designer feedback
             programmer_response = programmer.get_response(feedback)
             # Log the improved code length for debugging and tracking output size
-            logger.log(f"Programmer generated response (iteration {i+1}, response: {programmer_response.replace('\n', '$$$$')[:100]})")
+            logger.log(f"[Coordinator] Programmer generated response (iteration {i+1}, response: {programmer_response.replace('\n', '$$$$')[:100]})")
             
             # Programmer sends updated solution to Designer
             # Publish the improved solution back to the Designer for review
@@ -182,14 +182,14 @@ def run_conversation(designer, programmer, message_queue, initial_prompt, max_it
             )
         
         # Designer reviews updated solution
-        # Get all messages queued for the Designer from the message queue
-        messages = message_queue.get_messages(DESIGNER_ID)
-        # Check if any messages were retrieved (defensive programming)
-        if messages:
-            # Extract solution content from the last (most recent) message in the queue
-            solution = messages[-1].payload.get("content", "")
+        # Get the latest message for the Designer using the new get_latest_message() method
+        message = message_queue.get_latest_message(DESIGNER_ID)
+        # Check if a message was retrieved (defensive programming)
+        if message:
+            # Extract solution content from the message payload
+            solution = message.payload.get("content", "")
             # Log the solution being reviewed in current iteration
-            logger.log(f"Designer reviewing solution (iteration {i+1} - Solution - {solution.replace('\n', '$$$$')[:100]})")
+            logger.log(f"[Coordinator] Designer reviewing solution (iteration {i+1} - Solution - {solution.replace('\n', '$$$$')[:100]})")
             # Check if this is the first iteration (iteration 0) to use different prompt
             if i == 0:
                 # First iteration: use specific improvement prompt
@@ -200,7 +200,7 @@ def run_conversation(designer, programmer, message_queue, initial_prompt, max_it
                 # Subsequent iterations: provide solution directly for continued refinement
                 designer_response = designer.get_response(solution)
             # Log the feedback length for debugging and tracking output size
-            logger.log(f"Designer generated feedback (iteration {i+1}, length: {designer_response.replace('\n', '$$$$')[:100]})")
+            logger.log(f"[Coordinator] Designer generated feedback (iteration {i+1}, length: {designer_response.replace('\n', '$$$$')[:100]})")
             
             # Designer sends feedback to Programmer
             # Publish the designer's feedback to drive next iteration of improvements
@@ -214,7 +214,7 @@ def run_conversation(designer, programmer, message_queue, initial_prompt, max_it
         # Check if an output file path was provided for progress saving
         if output_file:
             # Log that progress is being saved to track file I/O operations
-            logger.log(f"Saving progress to {output_file}")
+            logger.log(f"[Coordinator] Saving progress to {output_file}")
             # Save current programmer messages to Excel for intermediate results
             programmer.save_to_excel(output_file)
     
@@ -224,16 +224,16 @@ def run_conversation(designer, programmer, message_queue, initial_prompt, max_it
         # Extend the all_messages list with designer's conversation history
         all_messages.extend(designer.messages)
         # Log number of messages collected from designer for tracking
-        logger.log(f"Collected {len(designer.messages)} messages from Designer")
+        logger.log(f"[Coordinator] Collected {len(designer.messages)} messages from Designer")
     # Check if programmer agent has a messages list attribute (defensive programming)
     if hasattr(programmer, 'messages') and isinstance(programmer.messages, list):
         # Extend the all_messages list with programmer's conversation history
         all_messages.extend(programmer.messages)
         # Log number of messages collected from programmer for tracking
-        logger.log(f"Collected {len(programmer.messages)} messages from Programmer")
+        logger.log(f"[Coordinator] Collected {len(programmer.messages)} messages from Programmer")
     
     # Log conversation completion for execution tracking
-    logger.log("Conversation completed")
+    logger.log("[Coordinator] Conversation completed")
     # Return all collected messages for analysis and storage
     return all_messages
 

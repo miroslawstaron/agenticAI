@@ -233,6 +233,77 @@ class MessageQueue(metaclass=SingletonMeta):
         
         return messages
     
+    def get_latest_message(self, recipient: str, consume: bool = True) -> Optional[Message]:
+        """
+        Retrieve the latest message for a specific recipient.
+        
+        This method retrieves the most recent message that matches:
+        - Exact recipient name match
+        - "broadcast" messages
+        - "anyone" messages (if consume=True, marks them as consumed)
+        
+        Args:
+            recipient: The recipient name to retrieve the latest message for
+            consume: If True, marks "anyone" messages as consumed (default: True)
+        
+        Returns:
+            Message object for the latest message, or None if no messages found
+        
+        Raises:
+            ValueError: If recipient is empty
+        """
+        if not recipient or not isinstance(recipient, str):
+            raise ValueError("Recipient must be a non-empty string")
+        
+        latest_message = None
+        
+        with self.lock:
+            cursor = self.connection.cursor()
+            
+            # Get the latest message for specific recipient or broadcast messages
+            cursor.execute('''
+                SELECT id, sender, recipient, payload, timestamp
+                FROM messages
+                WHERE (recipient = ? OR recipient = 'broadcast')
+                AND consumed = 0
+                ORDER BY id DESC
+                LIMIT 1
+            ''', (recipient,))
+            
+            row = cursor.fetchone()
+            if row:
+                msg_id, sender, recipient_name, payload_json, timestamp = row
+                payload = json.loads(payload_json)
+                latest_message = Message(sender, recipient_name, payload, msg_id)
+                return latest_message
+            
+            # Get the latest "anyone" message (first come, first served)
+            cursor.execute('''
+                SELECT id, sender, recipient, payload, timestamp
+                FROM messages
+                WHERE recipient = 'anyone'
+                AND consumed = 0
+                ORDER BY id DESC
+                LIMIT 1
+            ''')
+            
+            row = cursor.fetchone()
+            if row:
+                msg_id, sender, recipient_name, payload_json, timestamp = row
+                payload = json.loads(payload_json)
+                latest_message = Message(sender, recipient_name, payload, msg_id)
+                
+                # Mark "anyone" message as consumed if requested
+                if consume:
+                    cursor.execute('''
+                        UPDATE messages SET consumed = 1 WHERE id = ?
+                    ''', (msg_id,))
+                    self.connection.commit()
+                
+                return latest_message
+        
+        return latest_message
+    
     def listen(self, recipient: str, callback: Callable[[Message], None]):
         """
         Register a callback function to be invoked when messages arrive.

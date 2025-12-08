@@ -6,6 +6,7 @@ import json
 import os
 from agentCompiler import AgentCompiler
 from agentStaticAnalyzer import AgentStaticAnalyzer
+from logger import get_logger
 
 class AgentAIC(agent.AgentAI):
     '''This class is an agent that uses the Ollama server to generate C code.
@@ -22,30 +23,21 @@ class AgentAIC(agent.AgentAI):
     2. The second one is the conversation between the model and the user that is aimed to solve compilation errors.'''
 
     def __init__(self, server_address, model_name, my_role, max_tokens=16000, api_key=""):
-        self.server_address = server_address        # address of the server
-        self.model_name = model_name                # name of the model 
+        # Call parent __init__ to initialize base agent functionality including logging
+        super().__init__(server_address, model_name, my_role, max_tokens, api_key)
+        
         self.__response = ""                    # response from the model
         self.__mdCode = ""                      # markdown code block, which is part of the response
         self.__code = ""                        # just the code from the markdown code block   
-        self.__compile_result = ""              # result of the compilation using gcc
-        self.max_tokens = max_tokens              # maximum tokens for the response
-        self.api_key = api_key                    # API key for authentication
-        
-        # Set API key in environment for LiteLLM if provided
-        if self.api_key:
-            os.environ['OPENAI_API_KEY'] = self.api_key
-
-        # the main conversation between the model
-        self.messages = [                   
-            {"role": "system",
-             "content": my_role 
-            }
-        ] 
+        self.__compile_result = ""              # result of the compilation using gcc 
 
     def get_response(self, prompt):
         '''This method gets the response from the model.
         It sends the prompt to the model and returns the response.'''
         # send a request to the ollama server
+        
+        # Log the action
+        self.logger.log_agent_action(self.agent_id, "Sending prompt to LLM with compilation", f"Model: {self.model_name}")
         
         # add the user prompt to the messages list
         self.messages.append({"role": "user", "content": prompt})
@@ -70,6 +62,7 @@ class AgentAIC(agent.AgentAI):
                 # now we need to ask the compiler agent to compile the code
                 # and return the result
                 # we need to add the response to the messages list
+                self.logger.log_agent_action(self.agent_id, "Creating compiler agent for code validation")
                 agentComp = AgentCompiler(server_address=self.server_address, 
                                           model_name=self.model_name, 
                                           trials=3)
@@ -81,12 +74,19 @@ class AgentAIC(agent.AgentAI):
                 # add the response to the messages list
                 self.messages.append({"role": "assistant", "content": strCodeResponse})
                 
+                # Log successful response
+                self.logger.log_agent_action(self.agent_id, "Received and compiled code response")
+                
                 # contrary to the parent class, we need to return the code
                 # and not the response
                 return strCodeResponse
                     
             except Exception as e:
                 error_msg = str(e)
+                
+                # Log the exception
+                self.logger.log_exception(self.agent_id, e, "get_response (AgentAIC)")
+                
                 if 'timeout' in error_msg.lower():
                     print(f"Timeout occurred. Retrying {attempt + 1}/{retries}...")
                 else:
@@ -94,6 +94,7 @@ class AgentAIC(agent.AgentAI):
                     
                 if attempt == retries - 1:
                     print("Max retries reached. Exiting.")
+                    self.logger.log_agent_action(self.agent_id, "Max retries reached", "Returning None")
                     return None
         
         return None

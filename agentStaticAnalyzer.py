@@ -5,7 +5,9 @@ from litellm import completion
 import json
 import pandas as pd
 import os
+import uuid
 from agentCompiler import AgentCompiler
+from logger import get_logger
 
 
 class AgentStaticAnalyzer(agent.AgentAI):
@@ -22,6 +24,11 @@ class AgentStaticAnalyzer(agent.AgentAI):
         self.__trials = trials
         self.logs = []                   # number of trials to fix the compilation errors
         
+        # Generate unique agent ID
+        self.agent_id = str(uuid.uuid4())
+        
+        # Get logger instance
+        self.logger = get_logger()
 
         # initial compile messages queue
         self.__initial_analyzer_messages = [
@@ -33,6 +40,10 @@ class AgentStaticAnalyzer(agent.AgentAI):
         # the conversation between the model and the user
         # that is aimed to solve compilation errors
         self.__analyzer_messages = self.__initial_analyzer_messages
+        
+        # Log agent initialization
+        self.logger.log_agent_init(self.agent_id, self.__class__.__name__, 
+                                   "You are a C Programmer. You solve problems with C programs, no comments or explanations.")
 
     def get_response(self, code: str) -> str:
         '''This method analyzes the code using CPP and tries to fix the errors. 

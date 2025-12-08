@@ -33,6 +33,13 @@ class SingletonLogger:
                     cls._instance = super(SingletonLogger, cls).__new__(cls)
         return cls._instance
     
+    def _close_handlers(self):
+        """Close and remove all logging handlers."""
+        for handler in self._logger.handlers[:]:
+            handler.close()
+            self._logger.removeHandler(handler)
+        self._logger.handlers.clear()
+    
     def __init__(self, log_file: str = "execution.log", enabled: bool = False):
         """Initialize the logger (only once).
         
@@ -53,11 +60,8 @@ class SingletonLogger:
             self._logger = logging.getLogger('AgenticAI')
             self._logger.setLevel(logging.DEBUG)
             
-            # Properly close and remove any existing handlers
-            for handler in self._logger.handlers[:]:
-                handler.close()
-                self._logger.removeHandler(handler)
-            self._logger.handlers.clear()
+            # Close and remove any existing handlers
+            self._close_handlers()
             
             if self.enabled:
                 # Create file handler with UTF-8 encoding
@@ -87,11 +91,8 @@ class SingletonLogger:
                 self.enabled = True
                 self.log_file = log_file
                 
-                # Properly close and remove any existing handlers
-                for handler in self._logger.handlers[:]:
-                    handler.close()
-                    self._logger.removeHandler(handler)
-                self._logger.handlers.clear()
+                # Close and remove any existing handlers
+                self._close_handlers()
                 
                 # Create file handler with UTF-8 encoding
                 file_handler = logging.FileHandler(log_file, mode='a', encoding='utf-8')
@@ -111,11 +112,8 @@ class SingletonLogger:
         """Disable logging."""
         with SingletonLogger._lock:
             self.enabled = False
-            # Properly close and remove handlers
-            for handler in self._logger.handlers[:]:
-                handler.close()
-                self._logger.removeHandler(handler)
-            self._logger.handlers.clear()
+            # Close and remove handlers
+            self._close_handlers()
     
     def log(self, message: str, level: str = "INFO"):
         """Log a message with the specified level.

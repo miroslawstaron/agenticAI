@@ -17,11 +17,15 @@ from logger import SingletonLogger, get_logger
 class TestSingletonLogger(unittest.TestCase):
     """Test cases for the SingletonLogger class."""
 
+    def _reset_singleton(self):
+        """Helper method to reset singleton state for testing."""
+        SingletonLogger._instance = None
+        SingletonLogger._initialized = False
+
     def setUp(self):
         """Set up test fixtures."""
         # Reset singleton instance before each test
-        SingletonLogger._instance = None
-        SingletonLogger._initialized = False
+        self._reset_singleton()
         
         # Create a temporary log file for testing
         self.temp_dir = tempfile.mkdtemp()
@@ -30,8 +34,7 @@ class TestSingletonLogger(unittest.TestCase):
     def tearDown(self):
         """Clean up after tests."""
         # Reset singleton instance
-        SingletonLogger._instance = None
-        SingletonLogger._initialized = False
+        self._reset_singleton()
         
         # Clean up temporary log file
         if os.path.exists(self.test_log_file):

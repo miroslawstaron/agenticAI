@@ -3,6 +3,7 @@ import argparse
 import re
 from tqdm import tqdm  # Import tqdm for progress bar
 from agent import AgentAI
+from logger import get_logger
 
 
 ## File name to save
@@ -26,7 +27,16 @@ def main():
     # Parse command-line arguments
     parser = argparse.ArgumentParser(description="Run the AgentAI with a prompt.")
     parser.add_argument("--prompt", type=str, required=True, help="The prompt to send to the agent.")
+    parser.add_argument("--log", action="store_true", help="Enable logging to execution.log file.")
     args = parser.parse_args()
+    
+    # Initialize logger if --log flag is set
+    if args.log:
+        logger = get_logger()
+        logger.enable("execution.log")
+        logger.info("="*80)
+        logger.info("Starting new execution session")
+        logger.info("="*80)
 
     # Create an instance of the Agent class
     agentTeacher = AgentAI(server_address="http://lazythought.cse.chalmers.se/v1/chat/completions", 

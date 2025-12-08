@@ -5,6 +5,7 @@ from agentC import AgentAIC
 from agent import AgentAI
 from tqdm import tqdm
 import os
+from logger import get_logger
 
 MAX_ITERATIONS = 2  # Set the maximum number of iterations
 FILENAME_RESULT = "results/conversation_result_test.xlsx"
@@ -19,7 +20,19 @@ def main():
                         required=True, 
                         help="The prompt to send to the agent.")
     
+    parser.add_argument("--log", 
+                        action="store_true", 
+                        help="Enable logging to execution.log file.")
+    
     args = parser.parse_args()
+    
+    # Initialize logger if --log flag is set
+    if args.log:
+        logger = get_logger()
+        logger.enable("execution.log")
+        logger.info("="*80)
+        logger.info("Starting new execution session (main_agentc)")
+        logger.info("="*80)
 
     # Create an instance of the Agent class
     agentProgrammer = AgentAIC(server_address="http://deepestthought.cse.chalmers.se:11434", 

@@ -9,13 +9,14 @@ This example demonstrates a conversation between:
 The AgentAIC automatically compiles the code and fixes any compilation errors.
 """
 
-from agent import AgentAI
-from agentC import AgentAIC
 import sys
 import os
 
 # Add parent directory to path for imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from agent import AgentAI
+from agentC import AgentAIC
 
 def main():
     print("=" * 80)

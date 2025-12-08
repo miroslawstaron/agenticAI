@@ -10,14 +10,15 @@ This example demonstrates a three-way conversation:
 The human provides input at each iteration to guide the development.
 """
 
-from agent import AgentAI
-from agentH import AgentH
 import sys
 import os
 import pandas as pd
 
 # Add parent directory to path for imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from agent import AgentAI
+from agentH import AgentH
 
 def main():
     print("=" * 80)

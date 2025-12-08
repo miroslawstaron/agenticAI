@@ -1,18 +1,67 @@
 # agenticAI project
 
-This project is a simple project that illustrates how to use two different AI models to have a conversation with each other. 
+This project is a research framework that enables multi-agent AI conversations for code generation and analysis. It allows different AI models to collaborate as designers, programmers, compilers, and even incorporate human feedback in the development loop.
 
-The idea is to test how the models behave over time, so please let the conversation run for a while. 
+## Quick Start
 
-This program has only one argument --prompt "What you want the model to do".
+```bash
+# Install dependencies
+pip install -r requirements.txt
+
+# Run a basic conversation
+python main.py --prompt "Write a C program to calculate factorial"
+
+# Run with compilation validation
+python main_agentc.py --prompt "Write a linked list in C"
+
+# Run with human-in-the-loop
+python main_human.py --prompt "Review this code design"
+```
+
+## Documentation
+
+📚 **New to AgenticAI?** Start here:
+
+- **[User Guide](README_UserGuide.md)** - Complete guide for using the framework
+- **[Examples](examples/)** - Working examples with Fibonacci problems
+- **[Custom Agents Guide](README_CustomAgents.md)** - Create your own specialized agents
+
+📖 **Additional Documentation:**
+
+- **[Logging Guide](README_Logging.md)** - Debug and monitor agent activities
+- **[Message Queue](README_MessageQueue.md)** - Inter-agent communication
+- **[Diagram Agent](README_AgentDiagram.md)** - Generate Mermaid diagrams from code
+
+## Features
+
+- **Multi-Agent Conversations**: Create conversations between AI agents with specific roles
+- **C Code Generation**: Specialized agents for C programming with compilation support
+- **Human-in-the-Loop**: Integrate human feedback into AI conversation flows
+- **Code Validation**: Automatic compilation and error fixing with gcc
+- **Conversation Persistence**: Save all conversations to Excel/CSV/HTML for analysis
+- **Extensible Architecture**: Easy to create custom agents for specific tasks
+- **Comprehensive Logging**: Track all agent activities for debugging and research
+
+## Available Agents
+
+- **AgentAI** - Base agent for LLM conversations
+- **AgentAIC** - C code agent with automatic compilation
+- **AgentCompiler** - Compilation error detection and fixing
+- **AgentStaticAnalyzer** - Static code analysis without compilation
+- **AgentH** - Human-in-the-loop interaction
+- **AgentDiagram** - Mermaid diagram generation from source code
 
 ## What happens in the code
-There is one class that keeps the conversation with the model. 
 
-The main script instantiates two of these classes, starts the conversation between two models in two different servers. 
+The framework provides a base `AgentAI` class that manages conversations with Language Models. Scripts instantiate multiple agents with different roles (designer, programmer, etc.) and orchestrate conversations between them. Each agent maintains conversation history and can save results for analysis.
 
-## Using the key
-If you want to use the OpenAI servers, or another server with the API KEY, please set the OPENAI_API_KEY environment variable, for example: export OPENAI_API_KEY="your_token_here"
+## API Keys
+
+If you want to use OpenAI servers or another server with an API key, set the `OPENAI_API_KEY` environment variable:
+
+```bash
+export OPENAI_API_KEY="your_token_here"
+```
 
 ## MessageQueue - Inter-Agent Communication
 

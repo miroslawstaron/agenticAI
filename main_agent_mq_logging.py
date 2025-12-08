@@ -14,7 +14,7 @@ from agent import AgentAI
 from messagequeue import MessageQueue, get_message_queue, reset_message_queue
 from logger import SingletonLogger
 
-MAX_ITERATIONS = 2
+MAX_ITERATIONS = 100
 FILENAME_RESULT = "results/conversation_result_mq_logging.xlsx"
 API_KEY = os.getenv('OPENAI_API_KEY', '')
 

@@ -50,7 +50,7 @@ The `AgentAI` class provides:
 
 **Key Attributes:**
 - `self.messages` - List of conversation messages
-- `self.agent_id` - Unique identifier (UUID)
+- `self.agent_id` - Unique identifier (sequential 2-digit: 00-99)
 - `self.logger` - Logger instance
 - `self.server_address` - LLM server URL
 - `self.model_name` - Model identifier
@@ -118,7 +118,7 @@ touch agentYourName.py
 ```python
 import agent  # Base class
 from logger import get_logger  # Logging
-import uuid  # For unique IDs if needed
+from agent_id_manager import AgentIDManager  # For agent IDs if custom ID management needed
 # Add other dependencies as needed
 ```
 

@@ -36,12 +36,12 @@ def main():
 
     # Create an instance of the Agent class
     agentProgrammer = AgentAIC(server_address="http://deepestthought.cse.chalmers.se:11434", 
-                              model_name="deepseek-r1:70b",
+                              model_name="ollama/qwen3:4b",
                               api_key=API_KEY,
                               my_role="You are a C programmer. You respond with the code in C to solve the task. No comments or explanations")
     
     agentDesigner = AgentAI(server_address="http://deepestthought.cse.chalmers.se:11434", 
-                            model_name="deepseek-r1:70b",
+                            model_name="ollama/qwen3:4b",
                             api_key=API_KEY,
                             my_role="You are a C designer. You will be given a task and you will respond with design suggestions to solve or the task.")
     
@@ -72,5 +72,10 @@ def main():
 
     agentProgrammer.save_to_excel(FILENAME_RESULT)
 
+    # Initialize logger if --log flag is set
+    if args.log:
+        logger.info("="*80)
+        logger.info("Finished execution session (main_agentc)")
+        logger.info("="*80)
 if __name__ == "__main__":
     main()

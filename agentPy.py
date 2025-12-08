@@ -36,7 +36,7 @@ class AgentAIPy(agent.AgentAI):
         # send a request to the ollama server
         
         # Log the action
-        self.logger.log_agent_action(self.agent_id, "Sending prompt to LLM with execution", f"Model: {self.model_name}")
+        self.logger.log_agent_action(self.agent_id, "Sending prompt to LLM with execution", f"Model - {self.model_name}")
         
         # add the user prompt to the messages list
         self.messages.append({"role": "user", "content": prompt})
@@ -73,7 +73,7 @@ class AgentAIPy(agent.AgentAI):
                 self.messages.append({"role": "assistant", "content": strCodeResponse})
                 
                 # Log successful response
-                self.logger.log_agent_action(self.agent_id, "Received and executed code response")
+                self.logger.log_agent_action(self.agent_id, f"Received and executed code response - {strCodeResponse.replace('\n', '$$$$')}")
                 
                 # contrary to the parent class, we need to return the code
                 # and not the response

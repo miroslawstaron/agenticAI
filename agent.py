@@ -3,7 +3,7 @@ from litellm import completion
 import pandas as pd
 import re
 import os
-import uuid
+from agent_id_manager import AgentIDManager
 from logger import get_logger
 
 class AgentAI:
@@ -24,8 +24,8 @@ class AgentAI:
         # Prefer explicit api_key; else fall back to env var OPENAI_API_KEY
         self.api_key = api_key
         
-        # Generate unique agent ID
-        self.agent_id = str(uuid.uuid4())
+        # Generate unique agent ID (simple sequential 2-digit)
+        self.agent_id = AgentIDManager.get_next_id()
         
         # Get logger instance
         self.logger = get_logger()
@@ -51,7 +51,7 @@ class AgentAI:
         # send a request to the LLM via LiteLLM
         
         # Log the action
-        self.logger.log_agent_action(self.agent_id, "Sending prompt to LLM", f"Model: {self.model_name}")
+        self.logger.log_agent_action(self.agent_id, "Sending prompt to LLM", f"Model - {self.model_name}, Prompt - {prompt.replace('\n', '$$$$')}")
         
         # add the user prompt to the messages list
         self.messages.append({"role": "user", "content": prompt})
@@ -76,7 +76,7 @@ class AgentAI:
                 self.messages.append({"role": "assistant", "content": response_raw})
                 
                 # Log successful response
-                self.logger.log_agent_action(self.agent_id, "Received response from LLM")
+                self.logger.log_agent_action(self.agent_id, "Received response from LLM", f"Response - {response_raw.replace('\n', '$$$$')}")
                 
                 return response_raw
                 
@@ -100,12 +100,12 @@ class AgentAI:
         
 
     def start(self):
-        self.logger.log_agent_action(self.agent_id, "Agent started", f"Model: {self.model_name}, Server: {self.server_address}")
+        self.logger.log_agent_action(self.agent_id, "Agent started", f"Model - {self.model_name}, Server - {self.server_address}")
         print(f"Starting agent with model {self.model_name} at {self.server_address}")
 
     # this function saves the messages to a file
     def save_to_csv(self,filename):
-        self.logger.log_agent_action(self.agent_id, "Saving messages to CSV", f"File: {filename}")
+        self.logger.log_agent_action(self.agent_id, "Saving messages to CSV", f"File - {filename}")
         # open the file in write mode
         with open(filename, 'w') as f:
             # write the header with $ as separator
@@ -116,7 +116,7 @@ class AgentAI:
 
     # this function saves the messages to an Excel file
     def save_to_excel(self, filename):
-        self.logger.log_agent_action(self.agent_id, "Saving messages to Excel", f"File: {filename}")
+        self.logger.log_agent_action(self.agent_id, "Saving messages to Excel", f"File - {filename}")
         
         # convert the messages list to a DataFrame and rename columns if necessary
         df = pd.DataFrame(self.messages)

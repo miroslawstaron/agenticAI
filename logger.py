@@ -176,16 +176,19 @@ class SingletonLogger:
         """
         self.log(message, "CRITICAL")
     
-    def log_agent_init(self, agent_id: str, agent_class: str, system_prompt: str):
+    def log_agent_init(self, agent_id: str, agent_class: str, system_prompt: str, context: str = ""):
         """Log agent initialization with system prompt.
         
         Args:
             agent_id: Unique agent identifier
             agent_class: Name of the agent class
             system_prompt: The system prompt for the agent
+            context: Optional additional context information (default: empty string)
         """
         self.info(f"[Agent:{agent_id}] Initialized {agent_class}")
         self.info(f"[Agent:{agent_id}] System Prompt: {system_prompt}")
+        if context:
+            self.info(f"[Agent:{agent_id}] Context: {context}")
     
     def log_agent_action(self, agent_id: str, action: str, details: str = ""):
         """Log an agent action.

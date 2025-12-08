@@ -4,7 +4,7 @@ import re
 from litellm import completion
 import json
 import os
-import uuid
+from agent_id_manager import AgentIDManager
 from logger import get_logger
 
 class AgentCompiler(agent.AgentAI):
@@ -19,9 +19,9 @@ class AgentCompiler(agent.AgentAI):
         self.__code = ""                        # just the code from the markdown code block   
         self.__compile_result = ""              # result of the compilation using gcc 
         self.__trials = trials                   # number of trials to fix the compilation errors
-
-        # Generate unique agent ID
-        self.agent_id = str(uuid.uuid4())
+        
+        # Generate unique agent ID (simple sequential 2-digit)
+        self.agent_id = AgentIDManager.get_next_id()
         
         # Get logger instance
         self.logger = get_logger()
@@ -39,13 +39,14 @@ class AgentCompiler(agent.AgentAI):
         
         # Log agent initialization
         self.logger.log_agent_init(self.agent_id, self.__class__.__name__, 
-                                   "You are a C Programmer. You solve problems with C programs, no comments or explanations.")
+                                   "You are a C Programmer. You solve problems with C programs, no comments or explanations.",
+                                   f'Model - {self.model_name}, Server - {self.server_address}')
 
     def get_response(self, code: str) -> str:
         '''This method compiles the code using gcc and tries to fix the compilation errors. 
         It returns the result of the compilation.'''
 
-        self.logger.log_agent_action(self.agent_id, "Starting code compilation process")
+        self.logger.log_agent_action(self.agent_id, "Starting code compilation process", f"Initial code - {code.replace('\n', '$$$$')[:100]}")
         
         # check if the code is in the markdown code block
         # if it is, we extract the code from the markdown code block
@@ -72,7 +73,8 @@ class AgentCompiler(agent.AgentAI):
             attempts = 0
             while attempts < self.__trials and self.__compile_result != "Compilation successful":
                 print(f'Attempt {attempts + 1} to fix the compilation error...')
-                self.logger.log_agent_action(self.agent_id, f"Fixing attempt {attempts + 1}/{self.__trials}")
+                self.logger.log_agent_action(self.agent_id, f"Fixing attempt {attempts + 1}/{self.__trials}", 
+                                           f"Current code: {self.__code[:100]}, Current error: {self.__compile_result[:100]}")
                 
                 code = self.__solve_problem()
                 if code.__contains__("```c"):
@@ -99,7 +101,7 @@ class AgentCompiler(agent.AgentAI):
         It sends the prompt to the model and returns the response.'''
 
         # get the response from the model
-        strPrompt = f'For this program {self.__code}, I got the following compilation error: {self.__compile_result}. Please fix the code and return the fixed code in a markdown code block.'
+        strPrompt = f'For this program {self.__code}, I got the following compilation error: {self.__compile_result.replace('\n', '$$$$')}. Please fix the code and return the fixed code in a markdown code block.'
         
         # please note that we use the __compile_messages list to store the conversation
         # between the model and the user
@@ -136,7 +138,7 @@ class AgentCompiler(agent.AgentAI):
                 error_msg = str(e)
                 
                 # Log the exception
-                self.logger.log_exception(self.agent_id, e, "__get_response_compilation")
+                self.logger.log_exception(self.agent_id, e, "__get_response_compilation", f"Attempt {attempt + 1} of {retries}")
                 
                 if 'timeout' in error_msg.lower():
                     print(f"Timeout occurred. Retrying {attempt + 1}/{retries}...")

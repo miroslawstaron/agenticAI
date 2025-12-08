@@ -5,7 +5,7 @@ import sys
 from litellm import completion
 import json
 import os
-import uuid
+from agent_id_manager import AgentIDManager
 from logger import get_logger
 
 class AgentPyInterpreter(agent.AgentAI):
@@ -21,8 +21,8 @@ class AgentPyInterpreter(agent.AgentAI):
         self.__execution_result = ""            # result of the execution using Python 
         self.__trials = trials                   # number of trials to fix the execution errors
 
-        # Generate unique agent ID
-        self.agent_id = str(uuid.uuid4())
+        # Generate unique agent ID (simple sequential 2-digit)
+        self.agent_id = AgentIDManager.get_next_id()
         
         # Get logger instance
         self.logger = get_logger()

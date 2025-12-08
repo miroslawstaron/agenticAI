@@ -2,7 +2,7 @@ import agent
 import subprocess
 import re
 import json
-import uuid
+from agent_id_manager import AgentIDManager
 from logger import get_logger
 
 class AgentH(agent.AgentAI):
@@ -19,8 +19,8 @@ class AgentH(agent.AgentAI):
         self.__code = ""                        # just the code from the markdown code block   
         self.__compile_result = ""              # result of the compilation using gcc
         
-        # Generate unique agent ID
-        self.agent_id = str(uuid.uuid4())
+        # Generate unique agent ID (simple sequential 2-digit)
+        self.agent_id = AgentIDManager.get_next_id()
         
         # Get logger instance
         self.logger = get_logger()

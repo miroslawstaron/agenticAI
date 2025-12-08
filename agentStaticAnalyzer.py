@@ -5,7 +5,7 @@ from litellm import completion
 import json
 import pandas as pd
 import os
-import uuid
+from agent_id_manager import AgentIDManager
 from agentCompiler import AgentCompiler
 from logger import get_logger
 
@@ -24,8 +24,8 @@ class AgentStaticAnalyzer(agent.AgentAI):
         self.__trials = trials
         self.logs = []                   # number of trials to fix the compilation errors
         
-        # Generate unique agent ID
-        self.agent_id = str(uuid.uuid4())
+        # Generate unique agent ID (simple sequential 2-digit)
+        self.agent_id = AgentIDManager.get_next_id()
         
         # Get logger instance
         self.logger = get_logger()

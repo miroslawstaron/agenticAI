@@ -11,7 +11,7 @@ This logging system provides a thread-safe Singleton logger that tracks all agen
 - **Fast Logging**: Optimized for minimal performance impact using Python's built-in logging module
 - **Timestamped Entries**: All log entries include timestamps (YYYY-MM-DD HH:MM:SS format)
 - **Multiple Log Levels**: Supports DEBUG, INFO, WARNING, ERROR, and CRITICAL levels
-- **Agent Tracking**: Each agent gets a unique UUID for tracking throughout its lifecycle
+- **Agent Tracking**: Each agent gets a unique sequential ID (00-99) for tracking throughout its lifecycle
 - **System Prompt Logging**: Captures agent initialization with system prompts
 - **Exception Handling**: Automatically logs all exceptions with context
 
@@ -84,7 +84,7 @@ The `SingletonLogger` class in `logger.py` implements the Singleton pattern with
 ### Agent Integration
 
 Each agent class automatically:
-1. Generates a unique UUID on initialization
+1. Generates a unique sequential ID (00-99) on initialization
 2. Logs its system prompt when created
 3. Logs all actions (e.g., sending prompts, receiving responses)
 4. Logs all exceptions with context

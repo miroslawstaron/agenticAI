@@ -49,7 +49,7 @@ class AgentAIPy(agent.AgentAI):
                     model=self.model_name,
                     messages=self.messages,
                     temperature=0.3,
-                    max_tokens=16000,
+                    max_tokens=self.max_tokens,
                     api_base=self.server_address if self.server_address else None,
                     timeout=300
                 )
@@ -115,12 +115,12 @@ class AgentAIPy(agent.AgentAI):
         Line by line, with line breaks.'''
         
         # extract only the block that is between the ```python and ``` lines
-        self.code = self.__extract_python_code(code)
+        extracted_code = self.__extract_python_code(code)
         
         if code != "":
             # remove the first and the last line
-            self.code = self.code.split('\n')
+            extracted_code = extracted_code.split('\n')
             #mdCode = mdCode[1:-1]
-            self.code = '\n'.join(self.code)
+            extracted_code = '\n'.join(extracted_code)
         
-        return self.code
+        return extracted_code

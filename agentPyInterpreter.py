@@ -1,6 +1,7 @@
 import agent
 import subprocess
 import re
+import sys
 from litellm import completion
 import json
 import os
@@ -168,15 +169,15 @@ class AgentPyInterpreter(agent.AgentAI):
         Line by line, with line breaks.'''
         
         # extract only the block that is between the ```python and ``` lines
-        self.code = self.__extract_python_code(code)
+        extracted_code = self.__extract_python_code(code)
         
         if code != "":
             # remove the first and the last line
-            self.code = self.code.split('\n')
+            extracted_code = extracted_code.split('\n')
             #mdCode = mdCode[1:-1]
-            self.code = '\n'.join(self.code)
+            extracted_code = '\n'.join(extracted_code)
         
-        return self.code
+        return extracted_code
     
     # execute the code using Python
     def __execute_code(self, code: str) -> str:
@@ -188,7 +189,8 @@ class AgentPyInterpreter(agent.AgentAI):
             with open(f'./temp/code_temp.py', 'w+') as f:
                 f.write(self.__code)
             # execute the code using Python
-            result = subprocess.run(['python3', f'./temp/code_temp.py'], 
+            import sys
+            result = subprocess.run([sys.executable, f'./temp/code_temp.py'], 
                                   stdout=subprocess.PIPE, 
                                   stderr=subprocess.PIPE,
                                   timeout=5)  # 5 second timeout for safety

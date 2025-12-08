@@ -5,6 +5,7 @@ import sys
 import tempfile
 import threading
 import time
+import re
 from pathlib import Path
 
 # Add parent directory to path to import logger module
@@ -196,7 +197,6 @@ class TestSingletonLogger(unittest.TestCase):
         with open(self.test_log_file, 'r') as f:
             content = f.read()
             # Check for timestamp format (YYYY-MM-DD HH:MM:SS)
-            import re
             timestamp_pattern = r'\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}'
             self.assertIsNotNone(re.search(timestamp_pattern, content))
 

@@ -1,7 +1,7 @@
 """Singleton Logger for AgenticAI.
 
 This module provides a thread-safe Singleton logger for the AgenticAI project.
-It supports fast, asynchronous logging with timestamps and different log levels.
+It supports fast logging with timestamps and different log levels.
 All logs are written to the execution.log file.
 """
 

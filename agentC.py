@@ -23,7 +23,7 @@ class AgentAIC(agent.AgentAI):
     2. The second one is the conversation between the model and the user that is aimed to solve compilation errors.'''
 
     def __init__(self, server_address, model_name, my_role, max_tokens=16000, api_key=""):
-        # Call parent __init__ to set up logging and agent_id
+        # Call parent __init__ to initialize base agent functionality including logging
         super().__init__(server_address, model_name, my_role, max_tokens, api_key)
         
         self.__response = ""                    # response from the model

@@ -7,6 +7,7 @@ from tqdm import tqdm       # Import tqdm for progress bar
 from agent import AgentAI   # Import the agentAI class, this is for the designer
 from agentC import AgentAIC   # Import the AgentC class, this is for the programmer
 from agentH import AgentH   # Import the AgentH class, this is for the human
+from logger import get_logger
 
 
 ## File name to save
@@ -29,7 +30,16 @@ def main():
     # Parse command-line arguments
     parser = argparse.ArgumentParser(description="Run the AgentAI with a prompt.")
     parser.add_argument("--prompt", type=str, required=True, help="The prompt to send to the agent.")
+    parser.add_argument("--log", action="store_true", help="Enable logging to execution.log file.")
     args = parser.parse_args()
+    
+    # Initialize logger if --log flag is set
+    if args.log:
+        logger = get_logger()
+        logger.enable("execution.log")
+        logger.info("="*80)
+        logger.info("Starting new execution session (main_human)")
+        logger.info("="*80)
 
     # Create an instance of the Agent class
     agentDesigner = AgentAI(server_address="http://deepestthought.cse.chalmers.se:11434/v1/chat/completions", 

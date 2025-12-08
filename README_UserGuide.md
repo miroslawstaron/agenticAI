@@ -214,6 +214,55 @@ Generates Mermaid diagrams from source code.
 
 See [README_AgentDiagram.md](README_AgentDiagram.md) for detailed documentation.
 
+### 7. AgentAIPy (Python Code Agent)
+
+Extends AgentAI with automatic code execution using Python interpreter.
+
+**Features:**
+- Automatically executes generated Python code
+- Uses AgentPyInterpreter to fix runtime errors
+- Returns validated, executable code
+
+**Example:**
+```python
+from agentPy import AgentAIPy
+
+programmer = AgentAIPy(
+    server_address="http://localhost:11434",
+    model_name="deepseek-r1:70b",
+    my_role="You are a Python programmer. Write code in Python to solve tasks."
+)
+
+code = programmer.get_response("Write a function to calculate factorial")
+# Code is automatically executed and fixed if needed
+```
+
+### 8. AgentPyInterpreter
+
+Specialized agent for executing Python code and fixing runtime errors.
+
+**Features:**
+- Executes code with Python interpreter
+- Detects runtime errors
+- Asks LLM to fix errors iteratively
+- Returns working code or error details
+
+**Note:** Usually used internally by AgentAIPy, but can be used standalone.
+
+**Example:**
+```python
+from agentPyInterpreter import AgentPyInterpreter
+
+interpreter = AgentPyInterpreter(
+    server_address="http://localhost:11434",
+    model_name="deepseek-r1:70b",
+    trials=3
+)
+
+# Validate and fix Python code
+fixed_code = interpreter.get_response("print('Hello, World!')")
+```
+
 ## Usage Examples
 
 ### Example 1: Simple Designer-Programmer Conversation

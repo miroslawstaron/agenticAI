@@ -51,9 +51,39 @@ python main_human.py --prompt "Review this code design"
 - **AgentH** - Human-in-the-loop interaction
 - **AgentDiagram** - Mermaid diagram generation from source code
 
+## Architecture & Class Diagram
+
+The project follows a modular architecture with a base `AgentAI` class and specialized agent subclasses:
+
+**Key Design Patterns:**
+- **Singleton Pattern**: SingletonLogger and MessageQueue ensure single instances across the application
+- **Inheritance**: AgentAIC and AgentH extend the base AgentAI class
+- **Composition**: AgentAIC uses AgentCompiler and AgentStaticAnalyzer for specialized tasks
+- **Message-based Communication**: MessageQueue enables asynchronous inter-agent communication
+
+See `class_diagram.mmd` for the raw Mermaid diagram file.
+
+## Execution Flow - Fibonacci with Compiler Example
+
+The following sequence diagram shows how a typical conversation flows through the system using the `fibonacci_with_compiler.py` example:
+
+<img src="./sequence_diagram_fibonacci.png">
+
+**Key Points in the Flow:**
+1. **Initial Code Generation**: Programmer agent generates C code from the task prompt
+2. **Automatic Compilation**: AgentCompiler validates the code using gcc
+3. **Error Recovery**: If compilation fails, the AgentCompiler attempts to fix errors (up to 3 attempts)
+4. **Design Review**: Designer agent reviews the compiled code and provides feedback
+5. **Iterative Improvement**: The cycle repeats with designer feedback for multiple iterations
+6. **Conversation Persistence**: All exchanges are saved to an Excel file for later analysis
+
+See `sequence_diagram_fibonacci.mmd` for the raw Mermaid diagram file.
+
 ## What happens in the code
 
 The framework provides a base `AgentAI` class that manages conversations with Language Models. Scripts instantiate multiple agents with different roles (designer, programmer, etc.) and orchestrate conversations between them. Each agent maintains conversation history and can save results for analysis.
+
+<img src='./class_diagram.png'>
 
 ## API Keys
 

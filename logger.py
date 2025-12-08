@@ -24,7 +24,7 @@ class SingletonLogger:
     _lock: threading.Lock = threading.Lock()
     _initialized: bool = False
     
-    def __new__(cls):
+    def __new__(cls, *args, **kwargs):
         """Create or return the singleton instance."""
         if cls._instance is None:
             with cls._lock:
@@ -53,7 +53,10 @@ class SingletonLogger:
             self._logger = logging.getLogger('AgenticAI')
             self._logger.setLevel(logging.DEBUG)
             
-            # Remove any existing handlers
+            # Properly close and remove any existing handlers
+            for handler in self._logger.handlers[:]:
+                handler.close()
+                self._logger.removeHandler(handler)
             self._logger.handlers.clear()
             
             if self.enabled:
@@ -64,7 +67,7 @@ class SingletonLogger:
                 # Create formatter with timestamp
                 formatter = logging.Formatter(
                     '%(asctime)s - %(levelname)s - %(message)s',
-                    datefmt='%Y-%m-%d %H:%M:%S.%f'
+                    datefmt='%Y-%m-%d %H:%M:%S'
                 )
                 file_handler.setFormatter(formatter)
                 
@@ -84,7 +87,10 @@ class SingletonLogger:
                 self.enabled = True
                 self.log_file = log_file
                 
-                # Remove any existing handlers
+                # Properly close and remove any existing handlers
+                for handler in self._logger.handlers[:]:
+                    handler.close()
+                    self._logger.removeHandler(handler)
                 self._logger.handlers.clear()
                 
                 # Create file handler with UTF-8 encoding
@@ -94,7 +100,7 @@ class SingletonLogger:
                 # Create formatter with timestamp
                 formatter = logging.Formatter(
                     '%(asctime)s - %(levelname)s - %(message)s',
-                    datefmt='%Y-%m-%d %H:%M:%S.%f'
+                    datefmt='%Y-%m-%d %H:%M:%S'
                 )
                 file_handler.setFormatter(formatter)
                 
@@ -105,6 +111,10 @@ class SingletonLogger:
         """Disable logging."""
         with SingletonLogger._lock:
             self.enabled = False
+            # Properly close and remove handlers
+            for handler in self._logger.handlers[:]:
+                handler.close()
+                self._logger.removeHandler(handler)
             self._logger.handlers.clear()
     
     def log(self, message: str, level: str = "INFO"):

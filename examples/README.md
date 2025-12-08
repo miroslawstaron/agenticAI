@@ -6,7 +6,11 @@ This folder contains practical examples demonstrating how to use the AgenticAI f
 
 All examples focus on solving the **Fibonacci sequence problem** using different agent configurations. This allows you to compare approaches and understand the capabilities of each agent type.
 
+Examples are available for both **C programming** and **Python programming** to demonstrate the versatility of the framework.
+
 ## Available Examples
+
+### C Programming Examples
 
 ### 1. Simple Fibonacci (fibonacci_simple.py)
 
@@ -102,6 +106,62 @@ python examples/fibonacci_human_in_loop.py
 3. **You** provide your feedback
 4. Agents incorporate your feedback
 5. Process repeats for configured iterations
+
+---
+
+### Python Programming Examples
+
+### 4. Simple Python Fibonacci (fibonacci_python_simple.py)
+
+**Agents Used:** Designer + Programmer (Python, without execution)
+
+**Description:** Basic conversation between a designer and programmer agent to develop a Fibonacci Python program. No code execution is performed - this is a pure AI-to-AI conversation focused on design and implementation.
+
+**Key Features:**
+- Simple two-agent conversation for Python
+- Design feedback loop
+- No execution requirements
+- Good for understanding basic Python agent interactions
+
+**Run:**
+```bash
+python examples/fibonacci_python_simple.py
+```
+
+**Requirements:**
+- Python 3.7+
+- Access to an LLM server (Ollama or compatible)
+- No additional requirements
+
+**Output:**
+- `fibonacci_python_simple_conversation.xlsx` - Full conversation log
+
+---
+
+### 5. Python Fibonacci with Interpreter (fibonacci_python_with_interpreter.py)
+
+**Agents Used:** Designer + Programmer with Interpreter (AgentAIPy)
+
+**Description:** Enhanced conversation where the programmer agent automatically executes Python code. The AgentPyInterpreter validates all generated code and iteratively fixes any runtime errors.
+
+**Key Features:**
+- Automatic code execution with Python interpreter
+- Runtime error detection and fixing
+- Guaranteed executable output
+- Design feedback on executed code
+
+**Run:**
+```bash
+python examples/fibonacci_python_with_interpreter.py
+```
+
+**Requirements:**
+- Python 3.7+
+- Access to an LLM server
+- Python 3 interpreter (already available if you can run the example)
+
+**Output:**
+- `fibonacci_python_interpreted_conversation.xlsx` - Full conversation with executed code
 
 ---
 

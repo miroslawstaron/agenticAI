@@ -1,6 +1,14 @@
-# agenticAI project
+<img src='./logo.png'>
 
-This project is a research framework that enables multi-agent AI conversations for code generation and analysis. It allows different AI models to collaborate as designers, programmers, compilers, and even incorporate human feedback in the development loop.
+# AgenticAI for Software Engineering
+
+This project is a research framework that enables multi-agent AI conversations for several software engineering tasks: 
+* code generation,
+* diagram generation, 
+* requirement specification, and 
+* source code analysis. 
+
+It allows different AI models to collaborate as designers, programmers, compilers, and even incorporate human feedback in the development loop. 
 
 ## Quick Start
 

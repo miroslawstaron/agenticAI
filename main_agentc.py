@@ -35,13 +35,13 @@ def main():
         logger.info("="*80)
 
     # Create an instance of the Agent class
-    agentProgrammer = AgentAIC(server_address="http://deepestthought.cse.chalmers.se:11434", 
-                              model_name="ollama/qwen3:4b",
+    agentProgrammer = AgentAIC(server_address="http://localhost:11434", 
+                              model_name="ollama/qwen2.5-coder:latest",
                               api_key=API_KEY,
                               my_role="You are a C programmer. You respond with the code in C to solve the task. No comments or explanations")
     
-    agentDesigner = AgentAI(server_address="http://deepestthought.cse.chalmers.se:11434", 
-                            model_name="ollama/qwen3:4b",
+    agentDesigner = AgentAI(server_address="http://localhost:11434", 
+                            model_name="ollama/phi4-mini-reasoning:latest",
                             api_key=API_KEY,
                             my_role="You are a C designer. You will be given a task and you will respond with design suggestions to solve or the task.")
     

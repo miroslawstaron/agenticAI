@@ -1,28 +1,54 @@
+"""C Code Agent with Compilation Support.
+
+AgentAIC extends AgentAI with automatic C code compilation validation.
+It extracts C code from markdown blocks, compiles with gcc, and automatically
+attempts to fix compilation errors through iterative LLM prompts.
+"""
+
 import agent
 import subprocess
 import re
+from typing import Optional
 from litellm import completion
 import json
 import os
 from agentCompiler import AgentCompiler
 from agentStaticAnalyzer import AgentStaticAnalyzer
 from logger import get_logger
+import config
+
 
 class AgentAIC(agent.AgentAI):
-    '''This class is an agent that uses the Ollama server to generate C code.
-    It is a subclass of the AgentAI class.
-    It is used to generate C code and compile it using gcc.
-    It uses the requests library to communicate with the server.
-    It uses the subprocess library to compile the code using gcc.
-    It uses the re library to extract the code from the markdown code block.
-    It uses the json library to parse the response from the server.
-    It uses the tqdm library to show the progress of the iterations.
+    """C code generation agent with compilation validation.
     
-    This class has two pipelines when talking to the model: 
-    1. The first one is the main conversation between the model and the user.
-    2. The second one is the conversation between the model and the user that is aimed to solve compilation errors.'''
+    Extends AgentAI with C-specific capabilities:
+    - Automatic code extraction from markdown ```c...``` blocks
+    - GCC compilation with error detection
+    - Automated error fixing through iterative LLM prompts (max 3 trials)
+    - Composition with AgentCompiler for specialized compilation handling
+    
+    Attributes:
+        __response: Full model response including markdown
+        __mdCode: Markdown code block (```c ... ```)
+        __code: Extracted pure C code
+        __compile_result: Compilation output (stderr/stdout)
+    
+    Pipelines:
+        1. Main: User prompt → LLM generation → Code extraction → Compilation
+        2. Error recovery: Compilation error → Fix prompt → Retry (max 3x)
+    """
 
-    def __init__(self, server_address, model_name, my_role, max_tokens=16000, api_key=""):
+    def __init__(self, server_address: str, model_name: str, my_role: str, 
+                 max_tokens: int = config.LLM_MAX_TOKENS, api_key: str = "") -> None:
+        """Initialize C code agent with compilation support.
+        
+        Args:
+            server_address: LLM API endpoint
+            model_name: Model identifier
+            my_role: System prompt (e.g., "You are a C programmer")
+            max_tokens: Max tokens per response
+            api_key: Optional API authentication
+        """
         # Call parent __init__ to initialize base agent functionality including logging
         super().__init__(server_address, model_name, my_role, max_tokens, api_key)
         
@@ -31,30 +57,57 @@ class AgentAIC(agent.AgentAI):
         self.__code = ""                        # just the code from the markdown code block   
         self.__compile_result = ""              # result of the compilation using gcc 
         
-    def get_response(self, prompt):
-        '''This method gets the response from the model.
-        It sends the prompt to the model and returns the response.'''
+    def get_response(self, prompt: str) -> Optional[str]:
+        """Generate C code and compile it with automatic error fixing.
+        
+        Full pipeline:
+        1. Send prompt to LLM with temperature=0.3 (deterministic)
+        2. Extract C code from ```c ... ``` markdown block
+        3. Write code to ./temp/code_temp.c
+        4. Compile with: gcc -w code_temp.c -o a.out -lm
+        5. If compilation fails:
+           - Parse stderr for "error" keyword
+           - Generate fix prompt with error message
+           - Retry (max config.COMPILER_MAX_TRIALS times)
+        6. Return final response or None
+        
+        Args:
+            prompt: User/designer prompt requesting C code
+            
+        Returns:
+            Full response string with code and explanation, or None if failed
+            
+        Error Handling:
+            - Compilation errors trigger automatic retry with fix prompts
+            - Max 3 compilation attempts
+            - Logs all attempts via logger
+            
+        Example:
+            >>> agent = AgentAIC("localhost:11434", "ollama/qwen3:4b", "You are a C programmer")
+            >>> response = agent.get_response("Write a program that calculates factorial")
+            >>> # Returns response with working C code or None
+        """
         # send a request to the ollama server
         
         # Log the action
         self.logger.log_agent_action(self.agent_id, 
                                      "Sending prompt to LLM with compilation", 
-                                     f"Model - {self.model_name} , Prompt - {prompt.replace('\n', '$$$$')}")
+                                     f"Model - {self.model_name} , Prompt - {prompt.replace(chr(10), '$$$$')}")
         
         # add the user prompt to the messages list
         self.messages.append({"role": "user", "content": prompt})
 
-        retries = 3
+        retries = config.LLM_RETRY_ATTEMPTS
         for attempt in range(retries):
             try:
                 # Use LiteLLM completion API
                 response = completion(
                     model=self.model_name,
                     messages=self.messages,
-                    temperature=0.3,
-                    max_tokens=16000,
+                    temperature=config.LLM_TEMPERATURE_FIXING,
+                    max_tokens=config.LLM_MAX_TOKENS,
                     api_base=self.server_address if self.server_address else None,
-                    timeout=300
+                    timeout=config.LLM_TIMEOUT_SECONDS
                 )
 
                 # Extract the content from LiteLLM response

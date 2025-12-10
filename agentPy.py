@@ -1,27 +1,49 @@
+"""Python Code Agent with Execution Support.
+
+AgentAIPy extends AgentAI with automatic Python code execution validation.
+It extracts Python code from markdown blocks, executes with subprocess,
+and automatically attempts to fix runtime errors through iterative LLM prompts.
+"""
+
 import agent
 import subprocess
 import re
+from typing import Optional
 from litellm import completion
 import json
 import os
 from agentPyInterpreter import AgentPyInterpreter
 from logger import get_logger
+import config
+
 
 class AgentAIPy(agent.AgentAI):
-    '''This class is an agent that uses the Ollama server to generate Python code.
-    It is a subclass of the AgentAI class.
-    It is used to generate Python code and execute it using Python interpreter.
-    It uses the requests library to communicate with the server.
-    It uses the subprocess library to execute the code using Python.
-    It uses the re library to extract the code from the markdown code block.
-    It uses the json library to parse the response from the server.
-    It uses the tqdm library to show the progress of the iterations.
+    """Python code generation agent with execution validation.
     
-    This class has two pipelines when talking to the model: 
-    1. The first one is the main conversation between the model and the user.
-    2. The second one is the conversation between the model and the user that is aimed to solve execution errors.'''
+    Extends AgentAI with Python-specific capabilities:
+    - Automatic code extraction from markdown ```python...``` blocks
+    - Python interpreter execution with error detection
+    - Automated error fixing through iterative LLM prompts (max 3 trials)
+    - Composition with AgentPyInterpreter for specialized execution handling
+    
+    Attributes:
+        __response: Full model response including markdown
+        __mdCode: Markdown code block (```python ... ```)
+        __code: Extracted pure Python code
+        __execution_result: Execution output (stderr/stdout)
+    """
 
-    def __init__(self, server_address, model_name, my_role, max_tokens=16000, api_key=""):
+    def __init__(self, server_address: str, model_name: str, my_role: str, 
+                 max_tokens: int = config.LLM_MAX_TOKENS, api_key: str = "") -> None:
+        """Initialize Python code agent with execution support.
+        
+        Args:
+            server_address: LLM API endpoint
+            model_name: Model identifier
+            my_role: System prompt (e.g., "You are a Python programmer")
+            max_tokens: Max tokens per response
+            api_key: Optional API authentication
+        """
         # Call parent __init__ to initialize base agent functionality including logging
         super().__init__(server_address, model_name, my_role, max_tokens, api_key)
         
@@ -30,9 +52,30 @@ class AgentAIPy(agent.AgentAI):
         self.__code = ""                        # just the code from the markdown code block   
         self.__execution_result = ""            # result of the execution using Python 
 
-    def get_response(self, prompt):
-        '''This method gets the response from the model.
-        It sends the prompt to the model and returns the response.'''
+    def get_response(self, prompt: str) -> Optional[str]:
+        """Generate Python code and execute it with automatic error fixing.
+        
+        Full pipeline:
+        1. Send prompt to LLM with temperature=0.3 (deterministic)
+        2. Extract Python code from ```python ... ``` markdown block
+        3. Execute code with: python3 <script>
+        4. If execution fails:
+           - Capture stderr for error message
+           - Generate fix prompt with error message
+           - Retry (max config.LLM_RETRY_ATTEMPTS times)
+        5. Return final response or None
+        
+        Args:
+            prompt: User/designer prompt requesting Python code
+            
+        Returns:
+            Full response string with code and explanation, or None if failed
+            
+        Error Handling:
+            - Runtime errors trigger automatic retry with fix prompts
+            - Max 3 execution attempts
+            - Logs all attempts via logger
+        """
         # send a request to the ollama server
         
         # Log the action

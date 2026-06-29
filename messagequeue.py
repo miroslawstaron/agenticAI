@@ -15,14 +15,14 @@ from datetime import datetime, timezone
 
 class SingletonMeta(type):
     """Metaclass for implementing singleton pattern."""
-    
+
     _instances: Dict[type, object] = {}
     _lock = threading.Lock()
-    
+
     def __call__(cls, *args, **kwargs):
         """
         Implement singleton pattern with thread safety.
-        
+
         Returns:
             The singleton instance of the class
         """
@@ -32,6 +32,16 @@ class SingletonMeta(type):
                     instance = super(SingletonMeta, cls).__call__(*args, **kwargs)
                     cls._instances[cls] = instance
         return cls._instances[cls]
+
+    @classmethod
+    def reset_all(mcs):
+        """Reset all singleton instances for testing.
+
+        This method clears all instances from the registry, allowing
+        fresh instances to be created.
+        """
+        with mcs._lock:
+            mcs._instances.clear()
 
 
 class Message:
@@ -423,6 +433,17 @@ class MessageQueue(metaclass=SingletonMeta):
             self.connection.close()
         except:
             pass
+
+    @classmethod
+    def reset(cls):
+        """Reset the singleton instance for testing.
+
+        This method removes it from the singleton registry, allowing a fresh
+        instance to be created.
+        """
+        if cls in SingletonMeta._instances:
+            del SingletonMeta._instances[cls]
+        cls._initialized = False
 
 
 def get_message_queue() -> MessageQueue:

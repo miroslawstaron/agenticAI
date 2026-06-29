@@ -7,11 +7,13 @@ from unittest.mock import Mock, patch, MagicMock
 
 # Add parent directory to path to import modules
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 
 from requirements.agent_3gpp import Agent3GPP
+from test_fixtures import BaseAgentTestCase
 
 
-class TestAgent3GPP(unittest.TestCase):
+class TestAgent3GPP(BaseAgentTestCase):
     """Test cases for the Agent3GPP class."""
 
     def setUp(self):

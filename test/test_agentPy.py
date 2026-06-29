@@ -8,11 +8,13 @@ from unittest.mock import Mock, patch, MagicMock
 
 # Add parent directory to path to import modules
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 
 from agentPy import AgentAIPy
+from test_fixtures import BaseAgentTestCase
 
 
-class TestAgentAIPy(unittest.TestCase):
+class TestAgentAIPy(BaseAgentTestCase):
     """Test cases for the AgentAIPy class."""
 
     def setUp(self):

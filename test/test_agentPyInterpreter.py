@@ -9,11 +9,13 @@ import subprocess
 
 # Add parent directory to path to import modules
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 
 from agentPyInterpreter import AgentPyInterpreter
+from test_fixtures import BaseAgentTestCase
 
 
-class TestAgentPyInterpreter(unittest.TestCase):
+class TestAgentPyInterpreter(BaseAgentTestCase):
     """Test cases for the AgentPyInterpreter class."""
 
     def setUp(self):

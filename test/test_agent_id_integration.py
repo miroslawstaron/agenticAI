@@ -7,9 +7,10 @@ import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from agent_id_manager import AgentIDManager
+from test_fixtures import BaseAgentTestCase
 
 
-class TestAgentIDIntegration(unittest.TestCase):
+class TestAgentIDIntegration(BaseAgentTestCase):
     """Integration tests for agent ID assignment."""
 
     def setUp(self):

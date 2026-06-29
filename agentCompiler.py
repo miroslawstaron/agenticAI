@@ -136,9 +136,10 @@ class AgentCompiler(agent.AgentAI):
                     
             except Exception as e:
                 error_msg = str(e)
-                
+
                 # Log the exception
-                self.logger.log_exception(self.agent_id, e, "__get_response_compilation", f"Attempt {attempt + 1} of {retries}")
+                context = f"__get_response_compilation (Attempt {attempt + 1} of {retries})"
+                self.logger.log_exception(self.agent_id, e, context)
                 
                 if 'timeout' in error_msg.lower():
                     print(f"Timeout occurred. Retrying {attempt + 1}/{retries}...")

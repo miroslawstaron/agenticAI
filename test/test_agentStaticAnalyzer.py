@@ -9,11 +9,13 @@ import subprocess
 
 # Add parent directory to path to import modules
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 
 from agentStaticAnalyzer import AgentStaticAnalyzer
+from test_fixtures import BaseAgentTestCase
 
 
-class TestAgentStaticAnalyzer(unittest.TestCase):
+class TestAgentStaticAnalyzer(BaseAgentTestCase):
     """Test cases for the AgentStaticAnalyzer class."""
 
     def setUp(self):
@@ -205,8 +207,9 @@ class TestAgentStaticAnalyzer(unittest.TestCase):
 
     def test_save_to_excel(self):
         """Test saving logs to Excel file."""
-        # Use a unique filename that doesn't exist
-        temp_file = f'/tmp/test_static_analyzer_{os.getpid()}.xlsx'
+        # Use a temporary file with proper temporary directory
+        with tempfile.NamedTemporaryFile(mode='w', delete=False, suffix='.xlsx') as f:
+            temp_file = f.name
 
         try:
             # Ensure file doesn't exist

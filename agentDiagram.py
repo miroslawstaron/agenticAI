@@ -169,15 +169,15 @@ class AgentDiagram(agent.AgentAI):
             is_valid, error_msg = self.validate_mermaid_diagram(mermaid_content)
             
             if is_valid:
-                print(f"✓ Mermaid diagram validation successful!")
+                print(f"[OK] Mermaid diagram validation successful!")
                 return response_raw
             else:
                 fix_attempt += 1
                 if fix_attempt > max_fix_attempts:
-                    print(f"✗ Max fix attempts ({max_fix_attempts}) reached. Returning last diagram despite errors.")
+                    print(f"[WARN] Max fix attempts ({max_fix_attempts}) reached. Returning last diagram despite errors.")
                     return response_raw
-                
-                print(f"✗ Mermaid diagram validation failed (attempt {fix_attempt}/{max_fix_attempts})")
+
+                print(f"[FAIL] Mermaid diagram validation failed (attempt {fix_attempt}/{max_fix_attempts})")
                 print(f"Error: {error_msg}")
                 
                 # Ask the model to fix the errors

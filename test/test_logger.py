@@ -10,11 +10,13 @@ from pathlib import Path
 
 # Add parent directory to path to import logger module
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 
 from logger import SingletonLogger, get_logger
+from test_fixtures import BaseAgentTestCase
 
 
-class TestSingletonLogger(unittest.TestCase):
+class TestSingletonLogger(BaseAgentTestCase):
     """Test cases for the SingletonLogger class."""
 
     def _reset_singleton(self):
@@ -33,14 +35,30 @@ class TestSingletonLogger(unittest.TestCase):
 
     def tearDown(self):
         """Clean up after tests."""
-        # Reset singleton instance
+        import time
+        import shutil
+
+        # Reset singleton instance (closes handlers)
         self._reset_singleton()
-        
-        # Clean up temporary log file
+
+        # Give the OS time to release file handles (Windows is slow)
+        time.sleep(0.1)
+
+        # Clean up temporary log file with retry logic
         if os.path.exists(self.test_log_file):
-            os.remove(self.test_log_file)
+            for _ in range(5):  # Retry up to 5 times
+                try:
+                    os.remove(self.test_log_file)
+                    break
+                except (PermissionError, OSError):
+                    time.sleep(0.05)  # Brief wait before retry
+
+        # Clean up temp directory
         if os.path.exists(self.temp_dir):
-            os.rmdir(self.temp_dir)
+            try:
+                shutil.rmtree(self.temp_dir, ignore_errors=True)
+            except:
+                pass
 
     def test_singleton_pattern(self):
         """Test that only one instance is created."""

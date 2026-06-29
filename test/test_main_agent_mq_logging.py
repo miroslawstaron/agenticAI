@@ -5,10 +5,15 @@ Tests the event-driven agent communication with logging.
 """
 
 import unittest
+import sys
+import os
 from unittest.mock import Mock, MagicMock, patch, call
 import threading
 import time
 from io import StringIO
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 
 from main_agent_mq_logging import (
     create_agents,
@@ -20,9 +25,10 @@ from main_agent_mq_logging import (
 )
 from messagequeue import MessageQueue, reset_message_queue
 from logger import SingletonLogger
+from test_fixtures import BaseAgentTestCase
 
 
-class TestCreateAgents(unittest.TestCase):
+class TestCreateAgents(BaseAgentTestCase):
     """Test agent creation."""
     
     def test_create_agents_success(self):
@@ -56,20 +62,22 @@ class TestCreateAgents(unittest.TestCase):
         self.assertEqual(mock_agent_ai.call_count, 2)
 
 
-class TestAgentWorker(unittest.TestCase):
+class TestAgentWorker(BaseAgentTestCase):
     """Test AgentWorker class."""
-    
+
     def setUp(self):
         """Set up test fixtures."""
+        super().setUp()
         reset_message_queue()
         self.message_queue = MessageQueue()
         self.mock_agent = Mock()
         self.mock_agent.get_response.return_value = "Test response"
         self.mock_agent.messages = []
-    
+
     def tearDown(self):
         """Clean up after tests."""
         reset_message_queue()
+        super().tearDown()
     
     def test_agent_worker_initialization(self):
         """Test AgentWorker initialization."""
@@ -238,27 +246,29 @@ class TestAgentWorker(unittest.TestCase):
             main_agent_mq_logging.MAX_ITERATIONS = original_max
 
 
-class TestConversationOrchestrator(unittest.TestCase):
+class TestConversationOrchestrator(BaseAgentTestCase):
     """Test ConversationOrchestrator class."""
-    
+
     def setUp(self):
         """Set up test fixtures."""
+        super().setUp()
         reset_message_queue()
         self.message_queue = MessageQueue()
-        
+
         self.mock_designer = Mock()
         self.mock_designer.get_response.return_value = "Design feedback"
         self.mock_designer.messages = []
         self.mock_designer.save_to_excel = Mock()
-        
+
         self.mock_programmer = Mock()
         self.mock_programmer.get_response.return_value = "Code solution"
         self.mock_programmer.messages = []
         self.mock_programmer.save_to_excel = Mock()
-    
+
     def tearDown(self):
         """Clean up after tests."""
         reset_message_queue()
+        super().tearDown()
     
     def test_orchestrator_initialization(self):
         """Test orchestrator initialization."""
@@ -356,27 +366,29 @@ class TestConversationOrchestrator(unittest.TestCase):
         self.mock_programmer.save_to_excel.assert_called()
 
 
-class TestAgentCommunicationFlow(unittest.TestCase):
+class TestAgentCommunicationFlow(BaseAgentTestCase):
     """Test complete communication flow between agents."""
-    
+
     def setUp(self):
         """Set up test fixtures."""
+        super().setUp()
         reset_message_queue()
         self.message_queue = MessageQueue()
-        
+
         self.mock_designer = Mock()
         self.mock_designer.get_response.side_effect = ["Design feedback"]
         self.mock_designer.messages = []
         self.mock_designer.save_to_excel = Mock()
-        
+
         self.mock_programmer = Mock()
         self.mock_programmer.get_response.side_effect = ["Initial solution"]
         self.mock_programmer.messages = []
         self.mock_programmer.save_to_excel = Mock()
-    
+
     def tearDown(self):
         """Clean up after tests."""
         reset_message_queue()
+        super().tearDown()
     
     def test_single_message_exchange(self):
         """Test a single message exchange between agents."""
@@ -422,16 +434,18 @@ class TestAgentCommunicationFlow(unittest.TestCase):
         self.assertEqual(len(feedback_messages), 1)
 
 
-class TestConversationIntegration(unittest.TestCase):
+class TestConversationIntegration(BaseAgentTestCase):
     """Integration tests for the full conversation system."""
-    
+
     def setUp(self):
         """Set up test fixtures."""
+        super().setUp()
         reset_message_queue()
-    
+
     def tearDown(self):
         """Clean up after tests."""
         reset_message_queue()
+        super().tearDown()
     
     @patch('main_agent_mq_logging.AgentAI')
     def test_full_conversation_initialization(self, mock_agent_ai):

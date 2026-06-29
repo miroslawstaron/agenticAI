@@ -110,7 +110,7 @@ class AgentWorker:
                     # No messages, wait a bit before polling again
                     time.sleep(0.1)
             except Exception as e:
-                logger.log_exception(f"Error in {self.agent_id} worker: {str(e)}")
+                logger.log_exception(self.agent_id, e, "AgentWorker run loop")
                 time.sleep(0.5)
     
     def _process_message(self, message):
@@ -210,7 +210,7 @@ class AgentWorker:
                 self.agent.save_to_excel(self.output_file)
                 
         except Exception as e:
-            logger.log_exception(f"Error processing message in {self.agent_id}: {str(e)}")
+            logger.log_exception(self.agent_id, e, "process_message")
 
 
 class ConversationOrchestrator:
@@ -401,7 +401,7 @@ def main():
         logger.log("Conversation interrupted by user")
         print("\n✗ Conversation interrupted")
     except Exception as e:
-        logger.log_exception(f"Error during conversation: {str(e)}")
+        logger.error(f"Error during conversation: {str(e)}")
         print(f"\n✗ Error: {str(e)}")
     finally:
         # Clean up message queue

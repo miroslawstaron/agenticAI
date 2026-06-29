@@ -7,6 +7,9 @@ from unittest.mock import Mock, patch, MagicMock
 
 # Add parent directory to path to import modules
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
+
+from test_fixtures import BaseAgentTestCase
 
 # Try to import vllm, skip tests if not available
 try:
@@ -17,7 +20,7 @@ except ImportError:
 
 
 @unittest.skipUnless(VLLM_AVAILABLE, "vllm library not installed")
-class TestvllmAgentAI(unittest.TestCase):
+class TestvllmAgentAI(BaseAgentTestCase):
     """Test cases for the vllmAgentAI class."""
 
     @patch('agentvllm.LLM')

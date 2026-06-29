@@ -24,3 +24,8 @@ class AgentIDManager:
     def reset(cls):
         """Reset counter to 0. Useful for testing."""
         cls._counter = 0
+
+    @classmethod
+    def get_current_id(cls):
+        """Get the current counter without incrementing. Useful for testing."""
+        return cls._counter

@@ -205,7 +205,7 @@ class SingletonLogger:
     
     def log_exception(self, agent_id: str, exception: Exception, context: str = ""):
         """Log an exception.
-        
+
         Args:
             agent_id: Unique agent identifier
             exception: The exception that occurred
@@ -215,6 +215,24 @@ class SingletonLogger:
         if context:
             message = f"[Agent:{agent_id}] Exception in {context}: {type(exception).__name__}: {str(exception)}"
         self.error(message)
+
+    @classmethod
+    def reset(cls):
+        """Reset the singleton instance for testing.
+
+        This method clears the singleton instance and resets the initialized flag,
+        allowing a fresh logger instance to be created for the next test.
+        """
+        with cls._lock:
+            if cls._instance is not None:
+                # Close any open handlers
+                if hasattr(cls._instance, '_close_handlers'):
+                    try:
+                        cls._instance._close_handlers()
+                    except:
+                        pass
+            cls._instance = None
+            cls._initialized = False
 
 
 def get_logger() -> SingletonLogger:

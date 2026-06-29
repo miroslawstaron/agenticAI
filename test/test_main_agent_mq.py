@@ -8,21 +8,28 @@ from unittest.mock import Mock, patch, MagicMock
 
 # Add parent directory to path to import modules
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 
 from main_agent_mq import create_agents, run_conversation, DESIGNER_ID, PROGRAMMER_ID
 from messagequeue import MessageQueue
+from test_fixtures import MessageQueueTestCase, BaseAgentTestCase
 
 
-class TestMainAgentMQ(unittest.TestCase):
+class TestMainAgentMQ(MessageQueueTestCase):
     """Test cases for main_agent_mq module."""
     
     def setUp(self):
         """Set up test fixtures."""
+        super().setUp()
         self.message_queue = MessageQueue()
-    
+
     def tearDown(self):
         """Clean up after tests."""
-        self.message_queue.close()
+        try:
+            self.message_queue.close()
+        except:
+            pass
+        super().tearDown()
 
     @patch('main_agent_mq.AgentAI')
     def test_create_agents(self, mock_agent_class):
@@ -257,9 +264,9 @@ class TestMainAgentMQ(unittest.TestCase):
         self.assertEqual(received_messages[0].sender, PROGRAMMER_ID)
 
 
-class TestMainAgentMQIntegration(unittest.TestCase):
+class TestMainAgentMQIntegration(MessageQueueTestCase):
     """Integration tests for main_agent_mq module."""
-    
+
     @patch('main_agent_mq.AgentAI')
     def test_full_conversation_flow(self, mock_agent_class):
         """Test complete conversation flow with message queue."""

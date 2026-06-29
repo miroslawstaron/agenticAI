@@ -1,8 +1,15 @@
 import unittest
+import sys
+import os
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
+
 from agent_id_manager import AgentIDManager
+from test_fixtures import BaseAgentTestCase
 
 
-class TestAgentIDManager(unittest.TestCase):
+class TestAgentIDManager(BaseAgentTestCase):
     """Test cases for the AgentIDManager class."""
 
     def setUp(self):

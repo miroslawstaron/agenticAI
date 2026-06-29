@@ -1,0 +1,213 @@
+================================================================================
+SWE-BENCH COMMAND LINE QUICK START
+================================================================================
+
+FILES PROVIDED:
+  • test-swe-bench.bat         (Windows batch wrapper - RECOMMENDED)
+  • test-swe-bench.ps1         (PowerShell script - advanced)
+  • COMMAND_LINE_TESTING_GUIDE.md  (Detailed documentation)
+
+================================================================================
+QUICK START (3 WAYS)
+================================================================================
+
+OPTION 1: Command Prompt or PowerShell
+  cd C:\Users\miros\Documents\agenticAI
+  test-swe-bench.bat
+
+OPTION 2: PowerShell Direct
+  cd C:\Users\miros\Documents\agenticAI
+  .\test-swe-bench.ps1
+
+OPTION 3: PowerShell with Parameters
+  .\test-swe-bench.ps1 -Tasks 50 -Server "http://server:port" -Model "model-name"
+
+================================================================================
+COMMON COMMANDS
+================================================================================
+
+Quick Test (10 tasks, ~5 minutes)
+  test-swe-bench.bat
+
+Full Evaluation (300+ tasks, ~2 hours)
+  test-swe-bench.bat all
+
+Custom Task Count
+  test-swe-bench.bat 50
+
+Custom Server
+  test-swe-bench.bat 20 http://localhost:8000
+
+Custom Model
+  test-swe-bench.bat 30 http://lazythought.cse.chalmers.se:80 gpt-4
+
+Everything Custom
+  test-swe-bench.bat 25 http://server:8000 gpt-4
+
+Show Help
+  test-swe-bench.bat help
+
+================================================================================
+EXPECTED TIMES
+================================================================================
+
+10 tasks:    5-10 minutes
+20 tasks:    10-15 minutes
+50 tasks:    25-40 minutes
+100 tasks:   50-90 minutes
+All (300+):  1-4 hours (depends on model speed)
+
+================================================================================
+OUTPUT
+================================================================================
+
+All results saved to: ./swe_bench_results/
+
+Files generated:
+  • swe_bench_results_YYYYMMDD_HHMMSS.json  (machine-readable, full details)
+  • swe_bench_results_YYYYMMDD_HHMMSS.txt   (human-readable, summary)
+  • summary_YYYYMMDD_HHMMSS.json            (key metrics only)
+
+================================================================================
+PARAMETERS REFERENCE
+================================================================================
+
+BATCH FILE: test-swe-bench.bat [tasks] [server] [model]
+
+  tasks    (optional) Number of tasks or "all"
+           Default: 10
+           Examples: 5, 20, 50, all
+
+  server   (optional) LLM server URL
+           Default: http://lazythought.cse.chalmers.se:80
+           Examples: http://localhost:8000, http://server:8080
+
+  model    (optional) Model name
+           Default: gpt-oss:20b
+           Examples: gpt-4, claude-opus, llama-2
+
+================================================================================
+POWERSHELL PARAMETERS: test-swe-bench.ps1 [options]
+
+  -Tasks [value]         Number of tasks or "All" (default: 10)
+  -Server [url]          Server URL (default: http://lazythought.cse.chalmers.se:80)
+  -Model [name]          Model name (default: gpt-oss:20b)
+  -OutputDir [path]      Output directory (default: ./swe_bench_results)
+  -SkipDownload          Skip dataset download
+  -ShowLogs              Show detailed logs
+  -ParallelWorkers [n]   Number of workers (experimental)
+
+Examples:
+  .\test-swe-bench.ps1
+  .\test-swe-bench.ps1 -Tasks All
+  .\test-swe-bench.ps1 -Tasks 50 -ShowLogs
+  .\test-swe-bench.ps1 -Tasks 30 -Server "http://localhost:8000" -Model "gpt-4"
+
+================================================================================
+TROUBLESHOOTING
+================================================================================
+
+PowerShell execution policy error:
+  powershell -ExecutionPolicy Bypass -File test-swe-bench.ps1
+
+Python not found:
+  Make sure Python is installed and in your PATH
+  Test: python --version
+
+Server connection error:
+  Verify server is running: http://lazythought.cse.chalmers.se:80
+  Check your network connection
+  Try a different server
+
+Timeout errors:
+  Run fewer tasks: test-swe-bench.bat 5
+  Check server performance
+  Increase timeout settings
+
+================================================================================
+MONITORING & TRACKING
+================================================================================
+
+View latest results:
+  cat swe_bench_results\swe_bench_results_*.txt
+  (or open .txt file with text editor)
+
+View JSON results:
+  (open swe_bench_results\swe_bench_results_*.json in JSON viewer)
+
+Compare results over time:
+  Run tests and results are timestamped automatically
+  Compare: summary_20260629_100000.json vs summary_20260629_110000.json
+
+================================================================================
+EXPECTED PERFORMANCE
+================================================================================
+
+Model Type      Success Rate  Completion Rate  Avg Time
+-----------     -----------   ---------------  --------
+Weak (GPT3.5)   25-35%        70-80%           2-5s
+Medium (GPT4)   40-50%        85-95%           1-3s
+Strong (GPT4T+) 50-60%+       95%+             <2s
+
+Your Results: (will be shown after running)
+  Success Rate:  ___%
+  Completion:    ___/___
+  Avg Time:      __s
+
+================================================================================
+NEXT STEPS
+================================================================================
+
+1. QUICK TEST (5 min):
+   test-swe-bench.bat
+
+2. REVIEW RESULTS (1 min):
+   Open: swe_bench_results\swe_bench_results_*.txt
+
+3. CUSTOMIZE (as needed):
+   test-swe-bench.bat 50 http://your-server:8000 your-model
+
+4. FULL EVAL (optional, 1-4 hours):
+   test-swe-bench.bat all
+
+================================================================================
+SUPPORT
+================================================================================
+
+Detailed Guide:       COMMAND_LINE_TESTING_GUIDE.md
+Framework Info:       SWE_BENCH_TESTING_GUIDE.md
+Python Framework:     swe_bench_test.py
+
+================================================================================
+EXAMPLES BY USE CASE
+================================================================================
+
+DEVELOPMENT/TESTING:
+  test-swe-bench.bat 5          Quick smoke test
+
+QUICK BASELINE:
+  test-swe-bench.bat 10         Get initial metrics
+
+MODEL COMPARISON:
+  test-swe-bench.bat 20 http://server:1 model1
+  test-swe-bench.bat 20 http://server:2 model2
+
+PRODUCTION TESTING:
+  test-swe-bench.bat all        Comprehensive evaluation
+
+REGRESSION TESTING:
+  test-swe-bench.bat 50         Medium test for CI/CD
+
+================================================================================
+READY TO TEST!
+================================================================================
+
+Default test (recommended first step):
+  test-swe-bench.bat
+
+Then check results:
+  cat swe_bench_results\swe_bench_results_*.txt
+
+Good luck!
+
+================================================================================

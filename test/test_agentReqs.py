@@ -8,11 +8,13 @@ import pandas as pd
 
 # Add parent directory to path to import modules
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 
 from requirements.agent_reqs import AgentReqs
+from test_fixtures import BaseAgentTestCase
 
 
-class TestAgentReqs(unittest.TestCase):
+class TestAgentReqs(BaseAgentTestCase):
     """Test cases for the AgentReqs class."""
 
     def setUp(self):

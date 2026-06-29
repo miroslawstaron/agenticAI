@@ -9,11 +9,13 @@ import pandas as pd
 
 # Add parent directory to path to import agent module
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 
 from agentDiagram import AgentDiagram
+from test_fixtures import BaseAgentTestCase
 
 
-class TestAgentDiagram(unittest.TestCase):
+class TestAgentDiagram(BaseAgentTestCase):
     """Test cases for the AgentDiagram class."""
 
     def setUp(self):

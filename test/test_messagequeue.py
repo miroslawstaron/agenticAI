@@ -10,9 +10,10 @@ from unittest.mock import Mock
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from messagequeue import MessageQueue, Message
+from test_fixtures import BaseAgentTestCase, MessageQueueTestCase
 
 
-class TestMessage(unittest.TestCase):
+class TestMessage(BaseAgentTestCase):
     """Test cases for the Message class."""
     
     def test_message_initialization(self):
@@ -47,15 +48,17 @@ class TestMessage(unittest.TestCase):
         self.assertIn("agent2", repr_str)
 
 
-class TestMessageQueue(unittest.TestCase):
+class TestMessageQueue(MessageQueueTestCase):
     """Test cases for the MessageQueue class."""
-    
+
     def setUp(self):
         """Set up test fixtures."""
+        super().setUp()
         self.queue = MessageQueue()
-    
+
     def tearDown(self):
         """Clean up after tests."""
+        super().tearDown()
         self.queue.close()
     
     def test_initialization(self):

@@ -5,7 +5,6 @@ from agentC import AgentAIC
 from agent import AgentAI
 from tqdm import tqdm
 import os
-from logger import get_logger
 
 MAX_ITERATIONS = 2  # Set the maximum number of iterations
 FILENAME_RESULT = "results/conversation_result_test.xlsx"
@@ -20,28 +19,16 @@ def main():
                         required=True, 
                         help="The prompt to send to the agent.")
     
-    parser.add_argument("--log", 
-                        action="store_true", 
-                        help="Enable logging to execution.log file.")
-    
     args = parser.parse_args()
-    
-    # Initialize logger if --log flag is set
-    if args.log:
-        logger = get_logger()
-        logger.enable("execution.log")
-        logger.info("="*80)
-        logger.info("Starting new execution session (main_agentc)")
-        logger.info("="*80)
 
     # Create an instance of the Agent class
-    agentProgrammer = AgentAIC(server_address="http://localhost:11434", 
-                              model_name="ollama/qwen2.5-coder:latest",
+    agentProgrammer = AgentAIC(server_address="http://deepestthought.cse.chalmers.se:11434/v1/chat/completions", 
+                              model_name="deepseek-r1:70b",
                               api_key=API_KEY,
                               my_role="You are a C programmer. You respond with the code in C to solve the task. No comments or explanations")
     
-    agentDesigner = AgentAI(server_address="http://localhost:11434", 
-                            model_name="ollama/phi4-mini-reasoning:latest",
+    agentDesigner = AgentAI(server_address="http://deepestthought.cse.chalmers.se:11434/v1/chat/completions", 
+                            model_name="deepseek-r1:70b",
                             api_key=API_KEY,
                             my_role="You are a C designer. You will be given a task and you will respond with design suggestions to solve or the task.")
     
@@ -72,10 +59,5 @@ def main():
 
     agentProgrammer.save_to_excel(FILENAME_RESULT)
 
-    # Initialize logger if --log flag is set
-    if args.log:
-        logger.info("="*80)
-        logger.info("Finished execution session (main_agentc)")
-        logger.info("="*80)
 if __name__ == "__main__":
     main()

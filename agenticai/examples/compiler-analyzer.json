@@ -1,0 +1,103 @@
+{
+  "schema_version": 1,
+  "id": "compiler-analyzer",
+  "name": "C verification",
+  "description": "Generate C, then compile and analyze in parallel.",
+  "mode": "workflow",
+  "initial_task": "Write a C program that prints a greeting, then compile and statically analyze it.",
+  "agents": [
+    {
+      "id": "programmer",
+      "name": "Programmer",
+      "role": "You are a C programmer. Return a complete C program in a fenced code block.",
+      "provider_id": "demo",
+      "model": "demo",
+      "temperature": 0.5,
+      "max_tokens": 2048,
+      "context_tokens": 8192,
+      "tools": [
+        "compiler",
+        "analyzer"
+      ],
+      "topics": [],
+      "can_orchestrate": false,
+      "x": 60.0,
+      "y": 130.0,
+      "kind": "agent",
+      "tool_id": "",
+      "tool_arguments": {},
+      "max_visits": 3
+    },
+    {
+      "id": "compile",
+      "name": "Compile",
+      "role": "You are a helpful collaborator.",
+      "provider_id": "demo",
+      "model": "demo",
+      "temperature": 0.5,
+      "max_tokens": 2048,
+      "context_tokens": 8192,
+      "tools": [],
+      "topics": [],
+      "can_orchestrate": false,
+      "x": 710.0,
+      "y": 40.0,
+      "kind": "tool",
+      "tool_id": "compiler",
+      "tool_arguments": {
+        "code": "${message}"
+      },
+      "max_visits": 5
+    },
+    {
+      "id": "analyze",
+      "name": "Analyze",
+      "role": "You are a helpful collaborator.",
+      "provider_id": "demo",
+      "model": "demo",
+      "temperature": 0.5,
+      "max_tokens": 2048,
+      "context_tokens": 8192,
+      "tools": [],
+      "topics": [],
+      "can_orchestrate": false,
+      "x": 710.0,
+      "y": 230.0,
+      "kind": "tool",
+      "tool_id": "analyzer",
+      "tool_arguments": {
+        "code": "${message}"
+      },
+      "max_visits": 5
+    }
+  ],
+  "links": [
+    {
+      "id": "300a1ec12834",
+      "source": "programmer",
+      "target": "compile",
+      "template": "{message}",
+      "condition": "always",
+      "value": ""
+    },
+    {
+      "id": "a7dc8244f834",
+      "source": "programmer",
+      "target": "analyze",
+      "template": "{message}",
+      "condition": "always",
+      "value": ""
+    }
+  ],
+  "entry_agents": [
+    "programmer"
+  ],
+  "limits": {
+    "concurrency": 4,
+    "tool_concurrency": 4,
+    "max_agents": 16,
+    "max_calls": 100,
+    "max_steps": 200,
+    "active_seconds": 1200
+  }
+}

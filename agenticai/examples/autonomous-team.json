@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "id": "autonomous-team",
+  "name": "Autonomous team",
+  "description": "A coordinator creates a research assistant and delegates work.",
+  "mode": "autonomous",
+  "initial_task": "Delegate research on a small C application, review the findings, and summarize the solution.",
+  "agents": [
+    {
+      "id": "coordinator",
+      "name": "Coordinator",
+      "role": "Delegate research, review results, and complete the task.",
+      "provider_id": "demo",
+      "model": "demo",
+      "temperature": 0.5,
+      "max_tokens": 2048,
+      "context_tokens": 8192,
+      "tools": [],
+      "topics": [],
+      "can_orchestrate": true,
+      "x": 180.0,
+      "y": 100.0,
+      "kind": "agent",
+      "tool_id": "",
+      "tool_arguments": {},
+      "max_visits": 5
+    }
+  ],
+  "links": [],
+  "entry_agents": [
+    "coordinator"
+  ],
+  "limits": {
+    "concurrency": 4,
+    "tool_concurrency": 4,
+    "max_agents": 16,
+    "max_calls": 100,
+    "max_steps": 200,
+    "active_seconds": 1200
+  }
+}

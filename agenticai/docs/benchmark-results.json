@@ -1,0 +1,46 @@
+{
+  "environment": {
+    "python": "3.14.7",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "fixture_delay_ms": 30,
+    "rounds": 20,
+    "independent_agents": 4
+  },
+  "scenarios": {
+    "legacy_sequential": {
+      "median_ms": 138.0,
+      "p95_ms": 184.294,
+      "connections": 80,
+      "requests_per_second": 27.63,
+      "peak_python_kib": 560.9
+    },
+    "pooled_parallel": {
+      "median_ms": 63.083,
+      "p95_ms": 65.871,
+      "connections": 4,
+      "requests_per_second": 63.99,
+      "peak_python_kib": 1019.8
+    }
+  },
+  "independent_batch_speedup": 2.19,
+  "context": {
+    "turns_archived": 100,
+    "unbounded_request_bytes": 67931,
+    "bounded_request_bytes": 5473,
+    "messages_sent": 17
+  },
+  "persistence": {
+    "messages": 60,
+    "repeated_excel_ms": 1261.52,
+    "incremental_sqlite_ms": 108.48,
+    "speedup": 11.63
+  },
+  "rss_mib_after": 117.01,
+  "limitations": [
+    "Synthetic loopback HTTP fixture, not real model inference.",
+    "Parallelism applies only to independent agents; sequential dependencies are unchanged.",
+    "Python allocation peaks exclude model-server memory and are not steady-state RSS comparisons.",
+    "Context budget uses conservative UTF-8 bytes; it is not a provider tokenizer.",
+    "Repeated Excel baseline reflects the legacy loop; on-demand export cost is deferred, not eliminated."
+  ]
+}

@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "id": "teacher-student",
+  "name": "Teacher & student",
+  "description": "Two rounds of solution and feedback.",
+  "mode": "workflow",
+  "initial_task": "Explain how a binary search works and give a small example.",
+  "agents": [
+    {
+      "id": "student",
+      "name": "Student",
+      "role": "Solve the task and apply feedback.",
+      "provider_id": "demo",
+      "model": "demo",
+      "temperature": 0.5,
+      "max_tokens": 2048,
+      "context_tokens": 8192,
+      "tools": [],
+      "topics": [],
+      "can_orchestrate": false,
+      "x": 70.0,
+      "y": 100.0,
+      "kind": "agent",
+      "tool_id": "",
+      "tool_arguments": {},
+      "max_visits": 2
+    },
+    {
+      "id": "teacher",
+      "name": "Teacher",
+      "role": "Suggest improvements to the student's solution.",
+      "provider_id": "demo",
+      "model": "demo",
+      "temperature": 0.5,
+      "max_tokens": 2048,
+      "context_tokens": 8192,
+      "tools": [],
+      "topics": [],
+      "can_orchestrate": false,
+      "x": 420.0,
+      "y": 100.0,
+      "kind": "agent",
+      "tool_id": "",
+      "tool_arguments": {},
+      "max_visits": 2
+    }
+  ],
+  "links": [
+    {
+      "id": "fdeca47508b5",
+      "source": "student",
+      "target": "teacher",
+      "template": "{message}",
+      "condition": "always",
+      "value": ""
+    },
+    {
+      "id": "6a5d4f0deee6",
+      "source": "teacher",
+      "target": "student",
+      "template": "{message}",
+      "condition": "always",
+      "value": ""
+    }
+  ],
+  "entry_agents": [
+    "student"
+  ],
+  "limits": {
+    "concurrency": 4,
+    "tool_concurrency": 4,
+    "max_agents": 16,
+    "max_calls": 100,
+    "max_steps": 200,
+    "active_seconds": 1200
+  }
+}

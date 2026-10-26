@@ -1,0 +1,130 @@
+[
+  {
+    "id": "compiler",
+    "name": "C compiler",
+    "description": "Compile C code with GCC. Return diagnostics; does not execute the compiled program.",
+    "kind": "compiler",
+    "executable": "",
+    "args": [],
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "code"
+      ]
+    },
+    "stdin": "",
+    "cwd": "",
+    "env": {},
+    "timeout": 60,
+    "accepted_exit_codes": [
+      0
+    ],
+    "output_format": "text",
+    "artifacts": [],
+    "max_output": 12000,
+    "version_args": [
+      "--version"
+    ],
+    "plugin": ""
+  },
+  {
+    "id": "analyzer",
+    "name": "Static analyzer",
+    "description": "Analyze C code using cppcheck.",
+    "kind": "analyzer",
+    "executable": "",
+    "args": [],
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "code"
+      ]
+    },
+    "stdin": "",
+    "cwd": "",
+    "env": {},
+    "timeout": 60,
+    "accepted_exit_codes": [
+      0
+    ],
+    "output_format": "text",
+    "artifacts": [],
+    "max_output": 12000,
+    "version_args": [
+      "--version"
+    ],
+    "plugin": ""
+  },
+  {
+    "id": "shell",
+    "name": "Shell",
+    "description": "Execute a noninteractive command in the run workspace.",
+    "kind": "shell",
+    "executable": "",
+    "args": [],
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "command": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "command"
+      ],
+      "additionalProperties": false
+    },
+    "stdin": "",
+    "cwd": "",
+    "env": {},
+    "timeout": 60,
+    "accepted_exit_codes": [
+      0
+    ],
+    "output_format": "text",
+    "artifacts": [],
+    "max_output": 12000,
+    "version_args": [
+      "--version"
+    ],
+    "plugin": ""
+  },
+  {
+    "id": "python-version",
+    "name": "Python version",
+    "description": "Report the Python interpreter version.",
+    "kind": "cli",
+    "executable": "@python",
+    "args": [
+      "--version"
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    },
+    "stdin": "",
+    "cwd": "",
+    "env": {},
+    "timeout": 60,
+    "accepted_exit_codes": [
+      0
+    ],
+    "output_format": "text",
+    "artifacts": [],
+    "max_output": 12000,
+    "version_args": [
+      "--version"
+    ],
+    "plugin": ""
+  }
+]

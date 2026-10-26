@@ -1,129 +1,82 @@
-<img src='./logo.png'>
+# AgenticAI Studio
 
-# AgenticAI for Software Engineering
+A local visual workspace for configuring agents, connecting networks, and inspecting every conversation and tool call. Supports directed workflows and autonomous collaboration, including delegation, dynamic agents, topics, CLI tools, scripts, shell access, and Python plugins.
 
-This project is a research framework that enables multi-agent AI conversations for several software engineering tasks: 
-* code generation,
-* diagram generation, 
-* requirement specification, and 
-* source code analysis. 
+## Run the standalone application
 
-It allows different AI models to collaborate as designers, programmers, compilers, and even incorporate human feedback in the development loop. 
+On Windows, double-click **Start-Studio.cmd** in this project to start or reopen Studio at [http://127.0.0.1:8876](http://127.0.0.1:8876). The launcher runs the server in the background, waits until it is ready, and opens your browser. It preserves the existing workspace data. Reopen it after restarting Windows; refreshing a browser tab alone does not start the local server. Startup logs are saved under `.build/studio-launcher`.
 
-## Quick Start
+For remote access, run `Start-Studio.cmd -External`. This binds port 8876 on all interfaces and remembers that setting for subsequent launches. Remote visitors must log in; credentials are generated in `.agenticai/remote-access.json`. Loopback access continues to work without that login. Run `Open-Studio-Port.ps1` as administrator once to allow inbound TCP 8876, matching the SDV and 5G firewall rules. Use `Start-Studio.cmd -LocalOnly` to switch back. Stop the running Studio process before changing its binding. The launcher prints the machine's current IP addresses; opening the firewall does not configure upstream routers or DNS.
 
-```bash
-# Install dependencies
-pip install -r requirements.txt
+Python 3.11 or newer is required. The release wheel includes the compiled web interface and offline browser presentation.
 
-# Run a basic conversation
-python main.py --prompt "Write a C program to calculate factorial"
-
-# Run with compilation validation
-python main_agentc.py --prompt "Write a linked list in C"
-
-# Run with human-in-the-loop
-python main_human.py --prompt "Review this code design"
+```powershell
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install .\dist\agenticai_studio-1.0.0-py3-none-any.whl
+.\.venv\Scripts\agenticai.exe serve --open
 ```
 
-## Documentation
+Open [the local interface](http://127.0.0.1:8765). Use `--port 8876` if the port is occupied, or `--data PATH` for separate storage. Linux/macOS use `.venv/bin/agenticai`. No Node.js installation is needed to run the compiled UI; npm tools require Node/npm.
 
-📚 **New to AgenticAI?** Start here:
+The default example is **Programmer & designer**, using a deterministic demo provider with no model server or credentials required. Select **Start** to enter the initial task and choose its first recipients. Programmer receives the task first; Designer reviews its code and sends feedback for up to three rounds. The task is saved and exported with the network. Select an agent to configure its role, provider, model parameters, tools, and communication permissions. Select a link to edit its message template and condition.
 
-- **[User Guide](README_UserGuide.md)** - Complete guide for using the framework
-- **[Examples](examples/)** - Working examples with Fibonacci problems
-- **[Custom Agents Guide](README_CustomAgents.md)** - Create your own specialized agents
+## Docker
 
-📖 **Additional Documentation:**
-
-- **[Logging Guide](README_Logging.md)** - Debug and monitor agent activities
-- **[Message Queue](README_MessageQueue.md)** - Inter-agent communication
-- **[Diagram Agent](README_AgentDiagram.md)** - Generate Mermaid diagrams from code
-
-## Features
-
-- **Multi-Agent Conversations**: Create conversations between AI agents with specific roles
-- **C Code Generation**: Specialized agents for C programming with compilation support
-- **Human-in-the-Loop**: Integrate human feedback into AI conversation flows
-- **Code Validation**: Automatic compilation and error fixing with gcc
-- **Conversation Persistence**: Save all conversations to Excel/CSV/HTML for analysis
-- **Extensible Architecture**: Easy to create custom agents for specific tasks
-- **Comprehensive Logging**: Track all agent activities for debugging and research
-
-## Available Agents
-
-- **AgentAI** - Base agent for LLM conversations
-- **AgentAIC** - C code agent with automatic compilation
-- **AgentCompiler** - Compilation error detection and fixing
-- **AgentStaticAnalyzer** - Static code analysis without compilation
-- **AgentH** - Human-in-the-loop interaction
-- **AgentDiagram** - Mermaid diagram generation from source code
-
-## Architecture & Class Diagram
-
-The project follows a modular architecture with a base `AgentAI` class and specialized agent subclasses:
-
-**Key Design Patterns:**
-- **Singleton Pattern**: SingletonLogger and MessageQueue ensure single instances across the application
-- **Inheritance**: AgentAIC and AgentH extend the base AgentAI class
-- **Composition**: AgentAIC uses AgentCompiler and AgentStaticAnalyzer for specialized tasks
-- **Message-based Communication**: MessageQueue enables asynchronous inter-agent communication
-
-See `class_diagram.mmd` for the raw Mermaid diagram file.
-
-## Execution Flow - Fibonacci with Compiler Example
-
-The following sequence diagram shows how a typical conversation flows through the system using the `fibonacci_with_compiler.py` example:
-
-<img src="./sequence_diagram_fibonacci.png">
-
-**Key Points in the Flow:**
-1. **Initial Code Generation**: Programmer agent generates C code from the task prompt
-2. **Automatic Compilation**: AgentCompiler validates the code using gcc
-3. **Error Recovery**: If compilation fails, the AgentCompiler attempts to fix errors (up to 3 attempts)
-4. **Design Review**: Designer agent reviews the compiled code and provides feedback
-5. **Iterative Improvement**: The cycle repeats with designer feedback for multiple iterations
-6. **Conversation Persistence**: All exchanges are saved to an Excel file for later analysis
-
-See `sequence_diagram_fibonacci.mmd` for the raw Mermaid diagram file.
-
-## What happens in the code
-
-The framework provides a base `AgentAI` class that manages conversations with Language Models. Scripts instantiate multiple agents with different roles (designer, programmer, etc.) and orchestrate conversations between them. Each agent maintains conversation history and can save results for analysis.
-
-<img src='./class_diagram.png'>
-
-## API Keys
-
-If you want to use OpenAI servers or another server with an API key, set the `OPENAI_API_KEY` environment variable:
-
-```bash
-export OPENAI_API_KEY="your_token_here"
+```text
+docker compose up --build -d
 ```
 
-## MessageQueue - Inter-Agent Communication
+The image includes GCC, cppcheck, Bash, Node.js, and npm. Compose binds to loopback and persists application data in a named volume. Use `host.docker.internal` to reach a model server on the host. Agent execution is unprivileged; a restricted local helper handles explicit system-package installation requests.
 
-The project now includes a lightweight, thread-safe message queue for inter-agent communication using an in-memory SQLite database.
+## CLI tools and installation
 
-**Key Features:**
-- Simple API: `publish()`, `get_messages()`, and `listen()`
-- Three recipient modes: specific recipient, "broadcast", or "anyone" (first-come-first-served)
-- Thread-safe operations
-- Listener/hook support for automatic message handling
-- JSON-serializable payloads
+Register any available executable or script under **Tools & CLI**. Define argument templates, a JSON input schema, stdin, environment references, timeouts, accepted exit codes, output format, and artifact patterns. Test the registration, then enable it for individual agents. Shell access is optional and executes with the app account's permissions.
 
-**Quick Example:**
-```python
-from messagequeue import MessageQueue
+The installation screen previews and manages pip, npm, WinGet, Docker APT, and custom recipe jobs. Managed Python/npm environments persist in the data directory. Export a manifest or a derived-image recipe to reproduce tools elsewhere.
 
-mq = MessageQueue()
-mq.publish("Agent1", "Agent2", "Hello!")
-messages = mq.get_messages("Agent2")
-mq.close()
+## Model servers and credentials
+
+Add compatible HTTP chat-completion endpoints under **Model providers**. Configure the model served by each endpoint. Tool calling requires support from both server and model. API keys are environment-variable references, never browser configuration values.
+
+```powershell
+$env:OPENAI_API_KEY = "your-key"
+agenticai serve
 ```
 
-**Documentation:**
-- Full API reference: [README_MessageQueue.md](README_MessageQueue.md)
-- Usage examples: `examples_messagequeue.py`
-- Integration examples: `integration_examples_messagequeue.py`
-- Run tests: `python -m unittest test.test_messagequeue -v` 
+## Command-line networks
+
+```text
+agenticai validate agenticai/examples/teacher-student.json
+agenticai run agenticai/examples/teacher-student.json --prompt "Solve the task" --data ./demo-data
+```
+
+Existing `main.py`, `main_agentc.py`, and related scripts retain their synchronous core-agent interfaces. Install `.[legacy]` for their tqdm/Excel dependencies. Compiler/analyzer adapters now use isolated files, check return codes, and recheck applied repairs. Excel-only dependencies are optional: install `.[excel]` when working from source.
+
+## Documentation and presentation
+
+- [Quickstart](agenticai/docs/quickstart.md)
+- [Architecture](agenticai/docs/architecture.md)
+- [CLI tools and Python plugins](agenticai/docs/tools.md)
+- [Deployment and installation](agenticai/docs/deployment.md)
+- [API contracts](agenticai/docs/api.md)
+- [Performance analysis and measured results](agenticai/docs/performance.md)
+
+The app serves an [18-slide tutorial](http://127.0.0.1:8765/tutorial/) with actual screenshots, speaker notes, and printable slides. OpenAPI is at `/docs`.
+
+## Development and verification
+
+```text
+python -m pip install -e ".[dev,excel,benchmark]"
+cd frontend
+npm ci
+npm run build
+cd ..
+python -m pytest tests -q
+python scripts/benchmark.py
+python scripts/build_tutorial.py
+python -m build
+```
+
+`scripts/browser_verify.py` exercises the production UI and captures tutorial screenshots. `scripts/verify_container.py` tests the container's workflow, CLI execution, installation, and persistence.
+
+Some original files, including the old tests, dependency list, domain agents, and LICENSE, remain unavailable cloud placeholders in this workspace. Their content has not been overwritten or claimed as verified. The new test suite lives in `tests/`; `scripts/inspect_cloud_files.py` records bounded attempts to read the legacy files.

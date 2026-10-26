@@ -1,0 +1,13 @@
+[
+  {
+    "id": "demo",
+    "name": "Demo provider",
+    "kind": "demo",
+    "endpoint": "http://localhost:11434/v1/chat/completions",
+    "api_key_env": "",
+    "supports_tools": true,
+    "timeout": 300,
+    "retries": 2,
+    "concurrency": 2
+  }
+]

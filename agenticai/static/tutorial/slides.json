@@ -1,0 +1,92 @@
+[
+  {
+    "number": 1,
+    "title": "AgenticAI Studio",
+    "notes": "This tutorial follows the actual shipped interface. Start with the deterministic demo before connecting a real inference server. The application is single-user and binds to loopback by default. Source: quickstart.md."
+  },
+  {
+    "number": 2,
+    "title": "Installation",
+    "notes": "Install the supplied wheel from its local path; the command shown is a filename, not a promise of a public package registry release. Python 3.11+ is required. The default address is http://127.0.0.1:8765. Use --port when occupied and --data to select storage. Source: deployment.md."
+  },
+  {
+    "number": 3,
+    "title": "The workspace",
+    "notes": "The teacher/student demo ships with two visits per agent. Drag nodes to arrange the graph. More nodes adds human input, explicit tool steps, and joins. Source: quickstart.md."
+  },
+  {
+    "number": 4,
+    "title": "Model providers",
+    "notes": "Model discovery is optional. Manual model names are supported. In Docker, use host.docker.internal to reach a host model server. Enable tool calling only when both model and server support it. The test reports whether the probe tool was actually called. Source: architecture.md and deployment.md."
+  },
+  {
+    "number": 5,
+    "title": "Agent instructions",
+    "notes": "Agent library saves reusable node definitions. Duplicating a network preserves the setup while assigning a new network ID. Different agents may use different providers and models. Source: quickstart.md."
+  },
+  {
+    "number": 6,
+    "title": "Model parameters and budgets",
+    "notes": "The context policy uses conservative UTF-8 bytes, not a provider tokenizer. It retains full turns and matched tool exchanges. The original transcript remains in SQLite. Use run limits to control total agents, calls, concurrency, steps, and active time. Source: architecture.md."
+  },
+  {
+    "number": 7,
+    "title": "Communication links",
+    "notes": "Drag a right handle onto a left handle to create a link. Select a link to change its template and condition. Autonomous orchestrators may add outgoing links during a run; such changes do not overwrite the saved network. Source: architecture.md."
+  },
+  {
+    "number": 8,
+    "title": "Parallel workflows",
+    "notes": "The C verification example generates a program, then compiles and analyzes it in separate workspaces. GCC checks compilation; cppcheck reports findings. Generated programs are not run automatically. Conditional branches feeding a join must all deliver. Source: architecture.md and tools.md."
+  },
+  {
+    "number": 9,
+    "title": "The tool registry",
+    "notes": "The registry stores tool definitions, not credentials. Agents see only the tools enabled on their own configuration. Child agents can inherit a subset of their parent’s tools. Source: tools.md."
+  },
+  {
+    "number": 10,
+    "title": "CLI registration",
+    "notes": "Use an absolute executable path or a command on PATH. @python selects the app interpreter. Scripts require an explicit interpreter. Registered direct-executable argument values are not implicitly interpreted by a shell. For Node CLI .cmd shims on Windows, prefer node plus the JavaScript entry script. Source: tools.md."
+  },
+  {
+    "number": 11,
+    "title": "Tool testing",
+    "notes": "JSON output mode parses stdout into structured data. Oversized or invalid JSON fails clearly. Accepted exit codes default to zero. Tool logs are bounded and secrets are redacted. Test executions use separate workspaces. Source: tools.md."
+  },
+  {
+    "number": 12,
+    "title": "Installing tools",
+    "notes": "The installation screen is user initiated and is not exposed as a model tool. WinGet agreement and elevation requirements are not silently accepted. Managed Python/npm environments persist with application data. APT additions require a derived image or explicit restoration after container recreation. Source: deployment.md."
+  },
+  {
+    "number": 13,
+    "title": "Shell access",
+    "notes": "Shell access is powerful and intentional. It is not a sandbox between agents. A standalone shell can access host files available to the account. Container commands execute as UID 1000 and can access mounted files. Interactive terminal applications are outside this runner. Source: tools.md and architecture.md."
+  },
+  {
+    "number": 14,
+    "title": "Autonomous collaboration",
+    "notes": "The demo coordinator uses deterministic native tool calls to spawn a child and delegate work. Real models must support tool calling. Limits include dynamically created agents. Topic publication reaches connected subscribers. Source: architecture.md."
+  },
+  {
+    "number": 15,
+    "title": "Human input",
+    "notes": "Waiting time is excluded when all remaining activations are waiting for humans. The command-line runner prompts on stdin. Restarting the application marks unfinished runs interrupted rather than replaying tool side effects. Source: architecture.md and quickstart.md."
+  },
+  {
+    "number": 16,
+    "title": "Run monitoring",
+    "notes": "Pause does not undo in-flight work. Cancellation terminates local subprocess trees and outstanding local HTTP waits; external inference may already be executing. Token totals are shown only when providers report them. Source: api.md and architecture.md."
+  },
+  {
+    "number": 17,
+    "title": "History and exports",
+    "notes": "Excel support is an optional extra. Full transcript storage is incremental; exports are generated only when requested. HTML is escaped and formula-like spreadsheet cells are neutralized. Use stopped-server backups or SQLite’s backup mechanism. Source: deployment.md and api.md."
+  },
+  {
+    "number": 18,
+    "title": "Architecture and next steps",
+    "notes": "The performance report contains reproducible fixture measurements and their limits. Original cloud-backed files could not all be inspected. Model inference quality and real endpoint throughput must be evaluated separately. All tutorial screenshots are captures of the running application. Sources: performance.md, api.md, architecture.md."
+  }
+]

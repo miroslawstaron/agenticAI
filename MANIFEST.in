@@ -1,0 +1,17 @@
+include README.md Dockerfile compose.yaml .dockerignore requirements-runtime.lock
+include Start-Studio.ps1 Start-Studio.cmd
+include Open-Studio-Port.ps1
+include frontend/package.json frontend/package-lock.json frontend/tsconfig.json frontend/vite.config.ts frontend/index.html
+recursive-include frontend/src *.ts *.tsx *.css
+recursive-include frontend/tests *.mjs
+recursive-include scripts *.py
+recursive-include tests *.py
+recursive-include agenticai/docs *.md *.json
+recursive-include agenticai/examples *.json
+recursive-include agenticai/static *
+global-exclude __pycache__ *.pyc
+exclude LICENSE requirements.txt
+prune test
+prune .build
+prune .venv
+prune agenticai_studio-1.0.0

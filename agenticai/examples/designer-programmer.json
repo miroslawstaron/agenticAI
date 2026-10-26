@@ -1,0 +1,80 @@
+{
+  "schema_version": 1,
+  "id": "designer-programmer",
+  "name": "Programmer & designer",
+  "description": "Give Programmer a task, review the code with Designer, and apply feedback for three rounds.",
+  "mode": "workflow",
+  "initial_task": "Write a small C program that prints a greeting. Review its design and improve it using the designer's feedback.",
+  "agents": [
+    {
+      "id": "programmer",
+      "name": "Programmer",
+      "role": "You are a C programmer. Return a complete C program in a fenced code block.",
+      "provider_id": "demo",
+      "model": "demo",
+      "temperature": 0.5,
+      "max_tokens": 2048,
+      "context_tokens": 8192,
+      "tools": [
+        "compiler",
+        "analyzer"
+      ],
+      "topics": [],
+      "can_orchestrate": false,
+      "x": 60.0,
+      "y": 130.0,
+      "kind": "agent",
+      "tool_id": "",
+      "tool_arguments": {},
+      "max_visits": 3
+    },
+    {
+      "id": "designer",
+      "name": "Designer",
+      "role": "Review the C program against the original task. Suggest concrete design improvements for the programmer to apply.",
+      "provider_id": "demo",
+      "model": "demo",
+      "temperature": 0.5,
+      "max_tokens": 2048,
+      "context_tokens": 8192,
+      "tools": [],
+      "topics": [],
+      "can_orchestrate": false,
+      "x": 390.0,
+      "y": 130.0,
+      "kind": "agent",
+      "tool_id": "",
+      "tool_arguments": {},
+      "max_visits": 3
+    }
+  ],
+  "links": [
+    {
+      "id": "f9c6076bdb2c",
+      "source": "programmer",
+      "target": "designer",
+      "template": "Original task:\n{task}\n\nReview this program and suggest improvements:\n{message}",
+      "condition": "always",
+      "value": ""
+    },
+    {
+      "id": "9ccd90cc446b",
+      "source": "designer",
+      "target": "programmer",
+      "template": "Improve your program using this design feedback:\n{message}",
+      "condition": "always",
+      "value": ""
+    }
+  ],
+  "entry_agents": [
+    "programmer"
+  ],
+  "limits": {
+    "concurrency": 4,
+    "tool_concurrency": 4,
+    "max_agents": 16,
+    "max_calls": 100,
+    "max_steps": 200,
+    "active_seconds": 1200
+  }
+}
